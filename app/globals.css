@@ -67,3 +67,52 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
 
 @layer theme, base, components, utilities;
 @layer base { * { border-color: transparent; } }
+
+
+/* Painel administrativo privado */
+.admin-page { min-height: 100svh; padding: 28px 16px 48px; background: #070707; color: #f7f7f7; }
+.admin-wrap { width: min(100%, 850px); margin: 0 auto; }
+.admin-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.admin-brand { display: flex; align-items: center; gap: 12px; color: #8ab4ff; }
+.admin-header h1 { margin: 0; font-size: clamp(21px, 4vw, 29px); letter-spacing: -.5px; line-height: 1.2; }
+.admin-header p { margin: 6px 0 0; color: #a5a5a5; font-size: 14px; }
+.admin-panel { margin: 0 0 18px; padding: clamp(18px, 4vw, 28px); border: 1px solid #292929; border-radius: 18px; background: #101010; box-shadow: 0 16px 40px rgba(0,0,0,.2); }
+.admin-panel h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 20px; letter-spacing: -.2px; }
+.admin-panel > p { color: #aaa; line-height: 1.5; margin: 0 0 20px; font-size: 14px; }
+.admin-panel label { display: block; margin: 15px 0 7px; color: #d6d6d6; font-size: 13px; font-weight: 700; }
+.admin-panel input { width: 100%; min-width: 0; border: 1px solid #383838; border-radius: 10px; padding: 12px 13px; background: #080808; color: #fff; font: inherit; font-size: 14px; outline: none; }
+.admin-panel input:focus { border-color: #7aa7ff; box-shadow: 0 0 0 3px rgba(122,167,255,.12); }
+.admin-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; border: 1px solid transparent; border-radius: 10px; padding: 10px 13px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; white-space: nowrap; }
+.admin-button:disabled { opacity: .6; cursor: wait; }
+.admin-button.primary { margin-top: 16px; background: #4285f4; color: white; }
+.admin-button.primary:hover { background: #2d72e8; }
+.admin-button.secondary { background: #191919; border-color: #373737; color: #eee; }
+.admin-button.secondary:hover { background: #242424; }
+.admin-button.full { width: 100%; }
+.login-panel { max-width: 420px; margin: 8vh auto 20px; }
+.login-panel h2 { justify-content: center; }
+.login-panel > p { text-align: center; }
+.login-panel .admin-lock { margin: 0 auto 12px; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 16px; background: #1c1c1c; font-size: 27px; }
+.list-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.list-heading h2 { margin: 0; }
+.company-list { display: grid; gap: 13px; }
+.company-item { padding: 17px; border: 1px solid #2b2b2b; border-radius: 13px; background: #0b0b0b; }
+.company-item h3 { margin: 0 0 8px; font-size: 17px; }
+.company-item label { margin-top: 13px; }
+.link-row { display: flex; gap: 7px; align-items: center; }
+.link-row input { flex: 1; }
+.icon-button { min-width: 40px; padding: 9px; }
+.admin-muted, .admin-footnote { color: #888; font-size: 13px; line-height: 1.5; }
+.admin-success { margin: 12px 0; padding: 12px 14px; border: 1px solid #245c3a; border-radius: 10px; background: #0c2115; color: #a6edbd; font-size: 14px; }
+.admin-error { margin: 12px 0; padding: 12px 14px; border: 1px solid #6d2b2b; border-radius: 10px; background: #250d0d; color: #ffb6b6; font-size: 14px; }
+.admin-footnote { margin-top: 24px; text-align: center; }
+@media (max-width: 520px) {
+  .admin-page { padding: 18px 12px 32px; }
+  .admin-header { align-items: flex-start; }
+  .admin-brand { align-items: flex-start; }
+  .admin-header p { max-width: 220px; }
+  .admin-button { white-space: normal; }
+  .link-row { flex-wrap: wrap; }
+  .link-row input { flex-basis: 100%; }
+  .company-item { padding: 13px; }
+}
