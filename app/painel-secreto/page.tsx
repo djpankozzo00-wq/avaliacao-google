@@ -37,7 +37,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     const value = reviewUrl.trim()
-    if (!value || (name.trim() && !autoName)) return
+    if (!value) return
     let active = true
     const timer = setTimeout(async () => {
       try {
