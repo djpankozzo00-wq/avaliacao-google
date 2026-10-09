@@ -118,3 +118,59 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
   .link-row input { flex-basis: 100%; }
   .company-item { padding: 13px; }
 }
+
+
+/* Placa de avaliação: proporções e acabamento da referência */
+.review-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  padding-bottom: 46px;
+  justify-content: flex-start;
+}
+.google-mark { margin-top: 4px; }
+h1 { margin-top: 21px; }
+.subtitle { margin-bottom: 26px; }
+.qr-shell { width: min(67vw, 285px); padding: 13px; border-radius: 24px; }
+.qr-label { margin: 11px 0 8px; }
+.divider { display: none; }
+.actions {
+  width: min(100%, 330px);
+  justify-content: space-between;
+  margin: 0 0 17px;
+  gap: 12px;
+}
+.action-item { flex: 1; min-width: 0; gap: 5px; }
+.action-item span { font-size: clamp(18px, 4.8vw, 22px); }
+.or { align-self: center; padding: 0 2px; font-size: 23px; }
+.scan-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 58px;
+  color: #2867ff;
+}
+.scan-icon svg:last-child {
+  position: absolute;
+  top: 19px;
+  left: 24px;
+  color: #2867ff;
+  background: #0d0d0d;
+}
+.footer-line { width: min(100%, 330px); background: #bdbdbd; }
+.powered { margin: 16px 0 0; color: #f1f1f1; font-size: clamp(19px, 5vw, 25px); }
+.powered strong { font-size: 1.08em; }
+.blue-base {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 17px;
+  background: #174de0;
+}
+@media (max-height: 720px) {
+  .review-card { padding-bottom: 34px; }
+  .actions { margin-bottom: 12px; }
+  .blue-base { height: 12px; }
+}
