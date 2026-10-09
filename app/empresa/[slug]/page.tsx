@@ -36,7 +36,7 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <p className="subtitle">{company.name}</p>
       <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
       <p className="qr-label">QR CODE</p><div className="divider"/>
-      <div className="actions" aria-label="Toque ou escaneie o QR Code"><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/><QrCode size={19} strokeWidth={2.2}/></div><span>Escaneie</span></div></div>
+      <div className="actions" aria-label="Toque ou escaneie o QR Code"><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/></div><span>Toque</span></div><span className="or">ou</span><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/><QrCode size={19} strokeWidth={2.2}/></div><span>Escaneie</span></div></div>
       <div className="footer-line"/><p className="powered">Powered by <strong>{company.name}</strong></p>
     </section>
   </main>
