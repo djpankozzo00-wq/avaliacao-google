@@ -60,6 +60,15 @@ export async function updateCompany(id: string, input: CompanyInput) {
   return rows[0]
 }
 
+export async function deleteCompany(id: string) {
+  const rows = await request(`companies?id=eq.${encodeURIComponent(id)}&select=id,name`, {
+    method: "DELETE",
+    headers: { Prefer: "return=representation" },
+  })
+  if (!rows?.length) throw new Error("Empresa não encontrada.")
+  return rows[0]
+}
+
 function isGoogleReviewUrl(value: string) {
   try {
     const url = new URL(value)
