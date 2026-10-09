@@ -129,8 +129,8 @@ export default function AdminPage() {
             </section>
 
                         <section className="admin-panel">
-              <h2><MapPin size={20} /> Encontrar estabelecimento em Macaúbas, Bahia</h2>
-              <p>Consulte locais disponíveis no mapa em tempo real, abra o resultado no Google Maps e copie o link do estabelecimento para usar no cadastro.</p>
+              <h2><MapPin size={20} /> Gerar estabelecimentos em Macaúbas, Bahia</h2>
+              <p>Gere uma lista de estabelecimentos em Macaúbas em tempo real, abra o resultado no Google Maps e copie o link para usar no cadastro.</p>
               <form
                 onSubmit={async event => {
                   event.preventDefault()
