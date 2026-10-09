@@ -11,6 +11,8 @@ export default function AdminPage() {
   const [companies, setCompanies] = useState<Company[]>([])
   const [name, setName] = useState("")
   const [reviewUrl, setReviewUrl] = useState("")
+  const [autoName, setAutoName] = useState(false)
+  const [resolvingName, setResolvingName] = useState(false)
   const [editUrls, setEditUrls] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -33,6 +35,33 @@ export default function AdminPage() {
 
   useEffect(() => { void loadCompanies() }, [loadCompanies])
 
+  useEffect(() => {
+    const value = reviewUrl.trim()
+    if (!value || (name.trim() && !autoName)) return
+    let active = true
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch("/api/admin/companies/resolve-name", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ review_url: value }),
+        })
+        if (!response.ok) return
+        const data = await response.json()
+        if (active && typeof data.name === "string" && data.name.trim()) {
+          setName(data.name.trim())
+          setAutoName(true)
+        }
+      } catch {
+        // Alguns links do Google não disponibilizam o nome publicamente.
+      } finally {
+        if (active) setResolvingName(false)
+      }
+    }, 700)
+    setResolvingName(true)
+    return () => { active = false; clearTimeout(timer) }
+  }, [reviewUrl, name, autoName])
+
   async function login(event: FormEvent) {
     event.preventDefault(); setError(""); setMessage(""); setLoading(true)
     try {
@@ -50,7 +79,7 @@ export default function AdminPage() {
       const response = await fetch("/api/admin/companies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, review_url: reviewUrl }) })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível cadastrar.")
-      setName(""); setReviewUrl(""); setMessage("Empresa cadastrada e link exclusivo gerado.")
+      setName(""); setReviewUrl(""); setAutoName(false); setMessage("Empresa cadastrada e link exclusivo gerado.")
       await loadCompanies()
     } catch (e) { setError(e instanceof Error ? e.message : "Erro ao cadastrar.") }
     finally { setLoading(false) }
@@ -102,9 +131,9 @@ export default function AdminPage() {
               <h2><Plus size={20} /> Cadastrar empresa</h2>
               <p>Informe o nome e o link oficial de avaliação do Google. Um endereço exclusivo será gerado para essa empresa.</p>
               <label htmlFor="company-name">Nome da empresa</label>
-              <input id="company-name" value={name} onChange={e => setName(e.target.value)} placeholder="Ex.: Restaurante Central" minLength={2} required />
+              <input id="company-name" value={name} onChange={e => { setName(e.target.value); setAutoName(false) }} placeholder="Será preenchido pelo link do Google" minLength={2} required />
               <label htmlFor="review-url">Link de avaliação do Google</label>
-              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" required />
+              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" required />\n              <p className="admin-muted">{resolvingName ? "Identificando o estabelecimento pelo link..." : "Ao colar o link, tentaremos preencher o nome automaticamente. Se o Google não fornecer o nome, você poderá digitá-lo."}</p>
               <button className="admin-button primary" disabled={loading}><Plus size={17} /> {loading ? "Salvando..." : "Cadastrar e gerar link exclusivo"}</button>
             </form>
 
