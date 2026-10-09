@@ -17,6 +17,10 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
+  const [placeUrl, setPlaceUrl] = useState("")
+  const [placeName, setPlaceName] = useState("")
+  const [placeLoading, setPlaceLoading] = useState(false)
+  const [placeMessage, setPlaceMessage] = useState("")
 
   const loadCompanies = useCallback(async () => {
     setLoading(true)
@@ -149,6 +153,60 @@ export default function AdminPage() {
                   <button className="admin-button primary" type="button" onClick={() => void saveLink(company)} disabled={loading}><Save size={16} /> Salvar link de avaliação</button>
                 </article>)}
               </div>}
+            </section>
+
+            <section className="admin-panel">
+              <h2>🔎 Descobrir nome do lugar</h2>
+              <p>Cole um link do Google Maps, como https://maps.app.goo.gl/cju95adnbkhngmcA7, para tentar identificar o nome do estabelecimento.</p>
+              <label htmlFor="place-lookup-url">Link do Google Maps</label>
+              <input
+                id="place-lookup-url"
+                type="url"
+                value={placeUrl}
+                onChange={e => { setPlaceUrl(e.target.value); setPlaceName(""); setPlaceMessage("") }}
+                placeholder="https://maps.app.goo.gl/..."
+              />
+              <button
+                className="admin-button primary"
+                type="button"
+                disabled={placeLoading || !placeUrl.trim()}
+                onClick={async () => {
+                  setPlaceLoading(true)
+                  setPlaceName("")
+                  setPlaceMessage("")
+                  try {
+                    const response = await fetch("/api/admin/companies/resolve-name", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ review_url: placeUrl.trim() }),
+                    })
+                    const data = await response.json()
+                    if (!response.ok) throw new Error(data.error || "Não foi possível consultar esse link.")
+                    if (typeof data.name === "string" && data.name.trim()) {
+                      setPlaceName(data.name.trim())
+                      setPlaceMessage("Nome encontrado. Você pode copiá-lo abaixo.")
+                    } else {
+                      setPlaceMessage("O Google não disponibilizou o nome nesse link. Tente um link compartilhado diretamente do Google Maps ou digite o nome manualmente.")
+                    }
+                  } catch (e) {
+                    setPlaceMessage(e instanceof Error ? e.message : "Não foi possível consultar esse link.")
+                  } finally {
+                    setPlaceLoading(false)
+                  }
+                }}
+              >
+                <RefreshCw size={16} /> {placeLoading ? "Buscando nome..." : "Buscar nome do lugar"}
+              </button>
+              {placeName && (
+                <>
+                  <label htmlFor="place-lookup-result">Nome do lugar</label>
+                  <div className="link-row">
+                    <input id="place-lookup-result" value={placeName} readOnly />
+                    <button className="admin-button secondary icon-button" type="button" title="Copiar nome" onClick={() => void copy(placeName)}><Copy size={16} /></button>
+                  </div>
+                </>
+              )}
+              {placeMessage && <p className={placeName ? "admin-success" : "admin-muted"} role="status">{placeMessage}</p>}
             </section>
           </>
         )}
