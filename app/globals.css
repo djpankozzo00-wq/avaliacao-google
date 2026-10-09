@@ -41,7 +41,7 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
 .qr-shell img { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
 .qr-label { margin: 11px 0 15px; font-size: clamp(20px, 5vw, 26px); font-weight: 800; letter-spacing: 1.3px; }
 .divider, .footer-line { width: min(100%, 330px); height: 1px; background: #555; }
-.actions { width: min(100%, 300px); display: flex; align-items: center; justify-content: space-between; margin: 18px 0 15px; }
+.actions { width: min(100%, 300px); display: flex; align-items: center; justify-content: center; margin: 18px 0 15px; }
 .action-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #2867ff; }
 .action-item span { color: #f1f1f1; font-size: 20px; font-weight: 500; }
 .or { color: #f5f5f5; font-size: 22px; text-transform: lowercase; }
