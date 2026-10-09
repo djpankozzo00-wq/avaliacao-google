@@ -119,3 +119,20 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
   .company-item { padding: 13px; }
 }
 
+
+
+/* Ícones da instrução Toque ou Escaneie, conforme a referência */
+.actions { width: min(100%, 330px); justify-content: space-between; gap: 10px; margin: 18px 0 15px; }
+.action-item { flex: 1; min-width: 0; }
+.scan-icon { width: 58px; height: 58px; }
+.touch-item .scan-icon svg:last-child,
+.scan-item .scan-icon svg:last-child {
+  top: 19px;
+  left: 19px;
+  color: #2867ff;
+  background: #0d0d0d;
+}
+.touch-item .scan-icon svg:last-child { top: 20px; left: 17px; }
+.scan-item .scan-icon svg:last-child { top: 21px; left: 19px; color: #fff; }
+.action-item span { font-size: clamp(19px, 5vw, 22px); }
+.or { font-size: 23px; }
