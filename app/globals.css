@@ -88,6 +88,8 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
 .admin-button.primary:hover { background: #2d72e8; }
 .admin-button.secondary { background: #191919; border-color: #373737; color: #eee; }
 .admin-button.secondary:hover { background: #242424; }
+.admin-button.danger { margin-top: 10px; background: #8b1e1e; color: #fff; }
+.admin-button.danger:hover { background: #a52626; }
 .admin-button.full { width: 100%; }
 .login-panel { max-width: 420px; margin: 8vh auto 20px; }
 .login-panel h2 { justify-content: center; }
