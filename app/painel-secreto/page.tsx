@@ -3,7 +3,8 @@
 import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, MapPin, Plus, RefreshCw, Save, Search, ShieldCheck } from "lucide-react"
 
-type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }\ntype Establishment = { id: string; name: string; address: string; maps_url: string; osm_url?: string; category: string }
+type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }
+type Establishment = { id: string; name: string; address: string; maps_url: string; osm_url?: string; category: string }
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
@@ -17,10 +18,10 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
-  const [placeUrl, setPlaceUrl] = useState("")
-  const [placeName, setPlaceName] = useState("")
-  const [placeLoading, setPlaceLoading] = useState(false)
-  const [placeMessage, setPlaceMessage] = useState("")
+  const [establishmentQuery, setEstablishmentQuery] = useState("")
+  const [establishments, setEstablishments] = useState<Establishment[]>([])
+  const [establishmentsLoading, setEstablishmentsLoading] = useState(false)
+  const [establishmentsMessage, setEstablishmentsMessage] = useState("")
 
   const loadCompanies = useCallback(async () => {
     setLoading(true)
