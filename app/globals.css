@@ -136,3 +136,13 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
 .scan-item .scan-icon svg:last-child { top: 21px; left: 19px; color: #fff; }
 .action-item span { font-size: clamp(19px, 5vw, 22px); }
 .or { font-size: 23px; }
+
+
+/* Ilustrações completas de mão segurando celular, como na referência */
+.scan-icon { width: 100px; height: 112px; display: flex; align-items: center; justify-content: center; position: relative; }
+.scan-icon .hand-phone { position: static !important; display: block; width: 100px; height: 112px; color: #2454c5; background: transparent !important; }
+.actions { width: min(100%, 330px); gap: 10px; justify-content: space-between; align-items: flex-start; }
+.action-item { flex: 1; min-width: 0; gap: 7px; }
+.touch-item .scan-icon, .scan-item .scan-icon { height: 112px; }
+.or { align-self: center; margin-top: 28px; font-size: 23px; }
+.action-item span { font-size: clamp(19px, 5vw, 22px); }
