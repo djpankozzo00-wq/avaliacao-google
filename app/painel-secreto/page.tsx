@@ -1,9 +1,9 @@
 "use client"
 
 import { FormEvent, useCallback, useEffect, useState } from "react"
-import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck } from "lucide-react"
+import { Copy, ExternalLink, LogOut, MapPin, Plus, RefreshCw, Save, Search, ShieldCheck } from "lucide-react"
 
-type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }
+type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }\ntype Establishment = { id: string; name: string; address: string; maps_url: string; osm_url?: string; category: string }
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
@@ -155,60 +155,70 @@ export default function AdminPage() {
               </div>}
             </section>
 
-            <section className="admin-panel">
-              <h2>🔎 Descobrir nome do lugar</h2>
-              <p>Cole o link de avaliação do Google, como https://search.google.com/local/writereview?placeid=ChIJ-0dcvOHRXAcR7dotbzokGYQ, para tentar identificar o nome do estabelecimento.</p>
-              <label htmlFor="place-lookup-url">Link do Google Maps</label>
-              <input
-                id="place-lookup-url"
-                type="url"
-                value={placeUrl}
-                onChange={e => { setPlaceUrl(e.target.value); setPlaceName(""); setPlaceMessage("") }}
-                placeholder="https://search.google.com/local/writereview?placeid=..."
-              />
-              <button
-                className="admin-button primary"
-                type="button"
-                disabled={placeLoading || !placeUrl.trim()}
-                onClick={async () => {
-                  setPlaceLoading(true)
-                  setPlaceName("")
-                  setPlaceMessage("")
+                        <section className="admin-panel">
+              <h2><MapPin size={20} /> Procurar estabelecimentos em Macaúbas, Bahia</h2>
+              <p>Pesquise estabelecimentos usando uma consulta online atualizada. Os resultados dependem dos locais disponíveis no mapa. Você pode abrir cada resultado no Google Maps e copiar o link para usar no cadastro.</p>
+              <form
+                onSubmit={async event => {
+                  event.preventDefault()
+                  const term = establishmentQuery.trim()
+                  if (term.length < 2) {
+                    setEstablishmentsMessage("Digite o nome ou o tipo de estabelecimento que deseja procurar.")
+                    return
+                  }
+                  setEstablishmentsLoading(true)
+                  setEstablishments([])
+                  setEstablishmentsMessage("")
                   try {
-                    const response = await fetch("/api/admin/companies/resolve-name", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ review_url: placeUrl.trim() }),
-                    })
+                    const response = await fetch("/api/admin/companies/search-establishments?q=" + encodeURIComponent(term), { cache: "no-store" })
                     const data = await response.json()
-                    if (!response.ok) throw new Error(data.error || "Não foi possível consultar esse link.")
-                    if (typeof data.name === "string" && data.name.trim()) {
-                      setPlaceName(data.name.trim())
-                      setPlaceMessage("Nome encontrado. Você pode copiá-lo abaixo.")
-                    } else if (data.reason === "missing_api_key") {
-                      setPlaceMessage("Para buscar pelo Place ID, falta configurar GOOGLE_PLACES_API_KEY nas variáveis de ambiente da Vercel. Depois disso, tente novamente.")
-                    } else {
-                      setPlaceMessage("O Google não disponibilizou o nome nesse link. Confira se o Place ID está correto ou digite o nome manualmente.")
-                    }
+                    if (!response.ok) throw new Error(data.error || "Não foi possível procurar estabelecimentos.")
+                    setEstablishments(Array.isArray(data.results) ? data.results : [])
+                    if (!data.results?.length) setEstablishmentsMessage("Nenhum resultado encontrado. Tente outro nome ou tipo, como farmácia, mercado, salão ou restaurante.")
                   } catch (e) {
-                    setPlaceMessage(e instanceof Error ? e.message : "Não foi possível consultar esse link.")
+                    setEstablishmentsMessage(e instanceof Error ? e.message : "Não foi possível procurar estabelecimentos.")
                   } finally {
-                    setPlaceLoading(false)
+                    setEstablishmentsLoading(false)
                   }
                 }}
               >
-                <RefreshCw size={16} /> {placeLoading ? "Buscando nome..." : "Buscar nome do lugar"}
-              </button>
-              {placeName && (
-                <>
-                  <label htmlFor="place-lookup-result">Nome do lugar</label>
-                  <div className="link-row">
-                    <input id="place-lookup-result" value={placeName} readOnly />
-                    <button className="admin-button secondary icon-button" type="button" title="Copiar nome" onClick={() => void copy(placeName)}><Copy size={16} /></button>
-                  </div>
-                </>
+                <label htmlFor="establishment-search">Nome ou tipo de estabelecimento</label>
+                <div className="link-row">
+                  <input
+                    id="establishment-search"
+                    value={establishmentQuery}
+                    onChange={e => setEstablishmentQuery(e.target.value)}
+                    placeholder="Ex.: farmácia, mercado, restaurante..."
+                    minLength={2}
+                    required
+                  />
+                  <button className="admin-button primary icon-button" type="submit" title="Pesquisar" disabled={establishmentsLoading}>
+                    <Search size={16} />
+                  </button>
+                </div>
+                <p className="admin-muted">Pesquise por categoria ou nome. A busca consulta dados de mapa online e limita a pesquisa a Macaúbas, BA.</p>
+              </form>
+              {establishmentsLoading && <p className="admin-muted" role="status">Procurando estabelecimentos...</p>}
+              {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
+              {establishments.length > 0 && (
+                <div className="company-list">
+                  {establishments.map(place => (
+                    <article className="company-item" key={place.id}>
+                      <h3>{place.name}</h3>
+                      <p className="admin-muted">{place.address}</p>
+                      <p className="admin-muted">Categoria: {place.category}</p>
+                      <div className="link-row">
+                        <a className="admin-button secondary" href={place.maps_url} target="_blank" rel="noreferrer">
+                          <ExternalLink size={16} /> Abrir no Google Maps
+                        </a>
+                        <button className="admin-button primary" type="button" onClick={() => void copy(place.maps_url)}>
+                          <Copy size={16} /> Copiar link
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
               )}
-              {placeMessage && <p className={placeName ? "admin-success" : "admin-muted"} role="status">{placeMessage}</p>}
             </section>
           </>
         )}
