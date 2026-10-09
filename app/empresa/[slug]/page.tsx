@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { QrCode, Smartphone, Wifi } from "lucide-react"
+import { QrCode, Smartphone } from "lucide-react"
 
 type Company = { name: string; slug: string; review_url: string }
 
@@ -33,11 +33,11 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <GoogleMark />
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>Avalie nossa<br/>empresa!</h1>
-      <p className="subtitle">Leva só 30 segundos</p>
+      <p className="subtitle">{company.name}</p>
       <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
       <p className="qr-label">QR CODE</p><div className="divider"/>
-      <div className="actions" aria-label="Toque ou escaneie o QR Code"><div className="action-item"><div className="scan-icon"><Smartphone size={53} strokeWidth={1.5}/><Wifi size={23} strokeWidth={2}/></div><span>Toque</span></div><span className="or">ou</span><div className="action-item"><div className="scan-icon"><Smartphone size={53} strokeWidth={1.5}/><QrCode size={20} strokeWidth={2}/></div><span>Escaneie</span></div></div>
-      <div className="footer-line"/><p className="powered">Powered by <strong>StarTouch</strong></p><div className="blue-base" aria-hidden="true"/>
+      <div className="actions" aria-label="Toque ou escaneie o QR Code"><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/><QrCode size={19} strokeWidth={2.2}/></div><span>Escaneie</span></div></div>
+      <div className="footer-line"/><p className="powered">Powered by <strong>{company.name}</strong></p>
     </section>
   </main>
 }
