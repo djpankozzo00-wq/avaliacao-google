@@ -185,8 +185,10 @@ export default function AdminPage() {
                     if (typeof data.name === "string" && data.name.trim()) {
                       setPlaceName(data.name.trim())
                       setPlaceMessage("Nome encontrado. Você pode copiá-lo abaixo.")
+                    } else if (data.reason === "missing_api_key") {
+                      setPlaceMessage("Para buscar pelo Place ID, falta configurar GOOGLE_PLACES_API_KEY nas variáveis de ambiente da Vercel. Depois disso, tente novamente.")
                     } else {
-                      setPlaceMessage("O Google não disponibilizou o nome nesse link. Tente um link compartilhado diretamente do Google Maps ou digite o nome manualmente.")
+                      setPlaceMessage("O Google não disponibilizou o nome nesse link. Confira se o Place ID está correto ou digite o nome manualmente.")
                     }
                   } catch (e) {
                     setPlaceMessage(e instanceof Error ? e.message : "Não foi possível consultar esse link.")
