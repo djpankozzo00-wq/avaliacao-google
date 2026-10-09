@@ -157,14 +157,14 @@ export default function AdminPage() {
 
             <section className="admin-panel">
               <h2>🔎 Descobrir nome do lugar</h2>
-              <p>Cole um link do Google Maps, como https://maps.app.goo.gl/cju95adnbkhngmcA7, para tentar identificar o nome do estabelecimento.</p>
+              <p>Cole o link de avaliação do Google, como https://search.google.com/local/writereview?placeid=ChIJ-0dcvOHRXAcR7dotbzokGYQ, para tentar identificar o nome do estabelecimento.</p>
               <label htmlFor="place-lookup-url">Link do Google Maps</label>
               <input
                 id="place-lookup-url"
                 type="url"
                 value={placeUrl}
                 onChange={e => { setPlaceUrl(e.target.value); setPlaceName(""); setPlaceMessage("") }}
-                placeholder="https://maps.app.goo.gl/..."
+                placeholder="https://search.google.com/local/writereview?placeid=..."
               />
               <button
                 className="admin-button primary"
