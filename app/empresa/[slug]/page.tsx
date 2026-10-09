@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Hand, QrCode, Smartphone } from "lucide-react"
+import { QrCode, Smartphone } from "lucide-react"
 
 type Company = { name: string; slug: string; review_url: string }
 
@@ -33,10 +33,10 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <GoogleMark />
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>Avalie nossa<br/>empresa!</h1>
-      <p className="subtitle">{company.name} · Leva só 30 segundos</p>
+      <p className="subtitle">{company.name}</p>
       <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
       <p className="qr-label">QR CODE</p><div className="divider"/>
-      <div className="actions" aria-label="Opções de avaliação"><div className="action-item"><Hand size={47} strokeWidth={1.6}/><span>Toque</span></div><div className="or">ou</div><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/><QrCode size={19} strokeWidth={2.2}/></div><span>Escaneie</span></div></div>
+      <div className="actions" aria-label="Escaneie o QR Code"><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/><QrCode size={19} strokeWidth={2.2}/></div><span>Escaneie</span></div></div>
       <div className="footer-line"/><p className="powered">Powered by <strong>{company.name}</strong></p>
     </section>
   </main>
