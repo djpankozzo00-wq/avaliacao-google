@@ -60,7 +60,7 @@ export default function AdminPage() {
     }, 700)
     setResolvingName(true)
     return () => { active = false; clearTimeout(timer) }
-  }, [reviewUrl, name, autoName])
+  }, [reviewUrl])
 
   async function login(event: FormEvent) {
     event.preventDefault(); setError(""); setMessage(""); setLoading(true)
