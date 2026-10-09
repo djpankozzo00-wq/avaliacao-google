@@ -12,8 +12,6 @@ export default function AdminPage() {
   const [companies, setCompanies] = useState<Company[]>([])
   const [name, setName] = useState("")
   const [reviewUrl, setReviewUrl] = useState("")
-  const [autoName, setAutoName] = useState(false)
-  const [resolvingName, setResolvingName] = useState(false)
   const [editUrls, setEditUrls] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
@@ -40,33 +38,6 @@ export default function AdminPage() {
 
   useEffect(() => { void loadCompanies() }, [loadCompanies])
 
-  useEffect(() => {
-    const value = reviewUrl.trim()
-    if (!value) return
-    let active = true
-    const timer = setTimeout(async () => {
-      try {
-        const response = await fetch("/api/admin/companies/resolve-name", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ review_url: value }),
-        })
-        if (!response.ok) return
-        const data = await response.json()
-        if (active && typeof data.name === "string" && data.name.trim()) {
-          setName(data.name.trim())
-          setAutoName(true)
-        }
-      } catch {
-        // Alguns links do Google não disponibilizam o nome publicamente.
-      } finally {
-        if (active) setResolvingName(false)
-      }
-    }, 700)
-    setResolvingName(true)
-    return () => { active = false; clearTimeout(timer) }
-  }, [reviewUrl])
-
   async function login(event: FormEvent) {
     event.preventDefault(); setError(""); setMessage(""); setLoading(true)
     try {
@@ -84,7 +55,7 @@ export default function AdminPage() {
       const response = await fetch("/api/admin/companies", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, review_url: reviewUrl }) })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível cadastrar.")
-      setName(""); setReviewUrl(""); setAutoName(false); setMessage("Empresa cadastrada e link exclusivo gerado.")
+      setName(""); setReviewUrl(""); setMessage("Empresa cadastrada e link exclusivo gerado.")
       await loadCompanies()
     } catch (e) { setError(e instanceof Error ? e.message : "Erro ao cadastrar.") }
     finally { setLoading(false) }
@@ -136,9 +107,10 @@ export default function AdminPage() {
               <h2><Plus size={20} /> Cadastrar empresa</h2>
               <p>Informe o nome e o link oficial de avaliação do Google. Um endereço exclusivo será gerado para essa empresa.</p>
               <label htmlFor="company-name">Nome da empresa</label>
-              <input id="company-name" value={name} onChange={e => { setName(e.target.value); setAutoName(false) }} placeholder="Será preenchido pelo link do Google" minLength={2} required />
+              <input id="company-name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o nome do estabelecimento" minLength={2} required />
               <label htmlFor="review-url">Link de avaliação do Google</label>
-              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" required />\n              <p className="admin-muted">{resolvingName ? "Identificando o estabelecimento pelo link..." : "Ao colar o link, tentaremos preencher o nome automaticamente. Se o Google não fornecer o nome, você poderá digitá-lo."}</p>
+              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" required />
+              <p className="admin-muted">Use o buscador abaixo para encontrar o estabelecimento em Macaúbas e copiar o link do Google Maps.</p>
               <button className="admin-button primary" disabled={loading}><Plus size={17} /> {loading ? "Salvando..." : "Cadastrar e gerar link exclusivo"}</button>
             </form>
 
@@ -157,8 +129,8 @@ export default function AdminPage() {
             </section>
 
                         <section className="admin-panel">
-              <h2><MapPin size={20} /> Procurar estabelecimentos em Macaúbas, Bahia</h2>
-              <p>Pesquise estabelecimentos usando uma consulta online atualizada. Os resultados dependem dos locais disponíveis no mapa. Você pode abrir cada resultado no Google Maps e copiar o link para usar no cadastro.</p>
+              <h2><MapPin size={20} /> Encontrar estabelecimento em Macaúbas, Bahia</h2>
+              <p>Consulte locais disponíveis no mapa em tempo real, abra o resultado no Google Maps e copie o link do estabelecimento para usar no cadastro.</p>
               <form
                 onSubmit={async event => {
                   event.preventDefault()
@@ -197,7 +169,7 @@ export default function AdminPage() {
                     <Search size={16} />
                   </button>
                 </div>
-                <p className="admin-muted">Pesquise por categoria ou nome. A busca consulta dados de mapa online e limita a pesquisa a Macaúbas, BA.</p>
+                <p className="admin-muted">Digite um nome ou categoria. A consulta é feita online e fica limitada a Macaúbas, BA.</p>
               </form>
               {establishmentsLoading && <p className="admin-muted" role="status">Procurando estabelecimentos...</p>}
               {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
