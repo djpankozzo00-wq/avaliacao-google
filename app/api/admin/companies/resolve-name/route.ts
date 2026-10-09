@@ -28,18 +28,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Use um link oficial do Google." }, { status: 400 })
     }
 
-    const response = await fetch(url.toString(), {
-      redirect: "follow",
-      signal: AbortSignal.timeout(7000),
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; GoogleReviewLinkHelper/1.0)" },
-      cache: "no-store",
-    })
-    const finalUrl = new URL(response.url)
-    if (!allowedHost(finalUrl.hostname.toLowerCase())) {
-      return NextResponse.json({ name: "" })
+    const placeId = url.searchParams.get("placeid") || url.searchParams.get("query_place_id")
+    const urlsToTry = placeId
+      ? ["https://www.google.com/maps/search/?api=1&query_place_id=" + encodeURIComponent(placeId), url.toString()]
+      : [url.toString()]
+    let html = ""
+    for (const candidateUrl of urlsToTry) {
+      try {
+        const response = await fetch(candidateUrl, {
+          redirect: "follow",
+          signal: AbortSignal.timeout(7000),
+          headers: { "User-Agent": "Mozilla/5.0 (compatible; GoogleReviewLinkHelper/1.0)" },
+          cache: "no-store",
+        })
+        const finalUrl = new URL(response.url)
+        if (!allowedHost(finalUrl.hostname.toLowerCase())) continue
+        const candidateHtml = (await response.text()).slice(0, 1_000_000)
+        if (candidateHtml) { html = candidateHtml; if (/og:title|<title/i.test(candidateHtml)) break }
+      } catch {
+        // Tenta o próximo formato de URL.
+      }
     }
-
-    const html = (await response.text()).slice(0, 1_000_000)
+    if (!html) return NextResponse.json({ name: "" })
     const candidates = [
       html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)?.[1],
       html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)?.[1],
