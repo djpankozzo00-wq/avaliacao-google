@@ -9,10 +9,10 @@ function allowedHost(hostname: string) {
 
 function cleanTitle(value: string) {
   return value
-    .replace(/\\s*[-|·]\\s*Google Maps\\s*$/i, "")
-    .replace(/\\s*[-|·]\\s*Google\\s*$/i, "")
-    .replace(/^Google Maps\\s*[-|·:]?\\s*/i, "")
-    .replace(/\\s+/g, " ")
+    .replace(/\s*[-|·]\s*Google Maps\s*$/i, "")
+    .replace(/\s*[-|·]\s*Google\s*$/i, "")
+    .replace(/^Google Maps\s*[-|·:]?\s*/i, "")
+    .replace(/\s+/g, " ")
     .trim()
 }
 
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
     const candidates = [
       html.match(/<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i)?.[1],
       html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:title["']/i)?.[1],
-      html.match(/<title[^>]*>([\\s\\S]*?)<\\/title>/i)?.[1],
+      html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1],
     ].filter((value): value is string => Boolean(value))
 
     const name = validName((candidates[0] || candidates[1] || candidates[2] || "")
