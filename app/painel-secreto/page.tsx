@@ -1,7 +1,7 @@
 "use client"
 
 import { FormEvent, useCallback, useEffect, useState } from "react"
-import { Copy, ExternalLink, LogOut, MapPin, Plus, RefreshCw, Save, Search, ShieldCheck } from "lucide-react"
+import { Copy, ExternalLink, LogOut, MapPin, Plus, RefreshCw, Save, Search, ShieldCheck, Trash2 } from "lucide-react"
 
 type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }
 type Establishment = { id: string; name: string; address: string; maps_url: string; osm_url?: string; category: string }
@@ -73,6 +73,23 @@ export default function AdminPage() {
     finally { setLoading(false) }
   }
 
+  async function deleteCompany(company: Company) {
+    const confirmed = window.confirm(`Tem certeza que deseja apagar a empresa "${company.name}"? Essa ação não pode ser desfeita.`)
+    if (!confirmed) return
+    setError(""); setMessage(""); setLoading(true)
+    try {
+      const response = await fetch(`/api/admin/companies/${company.id}`, { method: "DELETE" })
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) throw new Error(data.error || "Não foi possível apagar a empresa.")
+      setMessage(`Empresa "${company.name}" apagada com sucesso.`)
+      await loadCompanies()
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao apagar empresa.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function logout() {
     await fetch("/api/admin/login", { method: "DELETE" })
     setAuthenticated(false); setCompanies([]); setMessage("Sessão encerrada.")
@@ -124,6 +141,7 @@ export default function AdminPage() {
                   <label htmlFor={`review-${company.id}`}>Link de avaliação configurado</label>
                   <input id={`review-${company.id}`} type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} />
                   <button className="admin-button primary" type="button" onClick={() => void saveLink(company)} disabled={loading}><Save size={16} /> Salvar link de avaliação</button>
+                  <button className="admin-button danger" type="button" onClick={() => void deleteCompany(company)} disabled={loading}><Trash2 size={16} /> Apagar empresa</button>
                 </article>)}
               </div>}
             </section>
