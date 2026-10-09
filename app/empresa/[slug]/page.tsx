@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { QrCode, Smartphone } from "lucide-react"
+import { QrCode, Smartphone, Wifi } from "lucide-react"
 
 type Company = { name: string; slug: string; review_url: string }
 
@@ -15,18 +15,13 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   useEffect(() => {
     let active = true
     params.then(({ slug }) => fetch(`/api/companies/${encodeURIComponent(slug)}`, { cache: "no-store" }))
-      .then(async response => {
-        if (!response.ok) throw new Error("Empresa não encontrada")
-        return response.json()
-      })
+      .then(async response => { if (!response.ok) throw new Error("Empresa não encontrada"); return response.json() })
       .then(data => { if (active) setCompany(data) })
       .catch(() => { if (active) setNotFound(true) })
     return () => { active = false }
   }, [params])
-
   if (!company && !notFound) return <main className="review-page"><section className="review-card"><p className="subtitle">Carregando avaliação...</p></section></main>
   if (!company) return <main className="review-page"><section className="review-card"><h1>Link não encontrado</h1><p className="subtitle">Confira o endereço com a empresa.</p></section></main>
-
   const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=14&data=${encodeURIComponent(company.review_url)}`
   return <main className="review-page" onClick={() => window.open(company.review_url, "_blank", "noopener,noreferrer")}>
     <section className="review-card" aria-label={`Placa de avaliação de ${company.name}`}>
@@ -36,7 +31,7 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <p className="subtitle">{company.name}</p>
       <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
       <p className="qr-label">QR CODE</p><div className="divider"/>
-      <div className="actions" aria-label="Toque ou escaneie o QR Code"><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/></div><span>Toque</span></div><span className="or">ou</span><div className="action-item"><div className="scan-icon"><Smartphone size={47} strokeWidth={1.6}/><QrCode size={19} strokeWidth={2.2}/></div><span>Escaneie</span></div></div>
+      <div className="actions" aria-label="Toque ou escaneie o QR Code"><div className="action-item touch-item"><div className="scan-icon"><Smartphone size={53} strokeWidth={1.5}/><Wifi size={25} strokeWidth={2}/></div><span>Toque</span></div><span className="or">ou</span><div className="action-item scan-item"><div className="scan-icon"><Smartphone size={53} strokeWidth={1.5}/><QrCode size={19} strokeWidth={2.2}/></div><span>Escaneie</span></div></div>
       <div className="footer-line"/><p className="powered">Powered by <strong>{company.name}</strong></p>
     </section>
   </main>
