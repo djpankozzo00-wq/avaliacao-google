@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       .replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'")
       .replace(/&lt;/g, "<").replace(/&gt;/g, ">"))
 
-    if (!name || /^(google( maps)?|pesquisa google|google search)$/i.test(name)) {
+    if (!name || /^(google( maps)?|pesquisa google|google search|sign in(?:\s*[-|·:]\s*google accounts)?|google accounts|login - google accounts|entrar - contas do google|sign in)$/i.test(name) || /google accounts|sign in|fazer login|entrar na conta/i.test(name)) {
       return NextResponse.json({ name: "" })
     }
     return NextResponse.json({ name: name.slice(0, 120) })
