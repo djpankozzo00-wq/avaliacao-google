@@ -19,10 +19,45 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [pixCopyPaste, setPixCopyPaste] = useState("")
   const [pixError, setPixError] = useState("")
+  const [wifiFocus, setWifiFocus] = useState(false)
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("tipo")
     if (requested && ["google", "pix", "instagram", "wifi", "whatsapp"].includes(requested)) setActiveKind(requested)
   }, [])
+  useEffect(() => {
+    if (activeKind !== "wifi") {
+      setWifiFocus(false)
+      return
+    }
+    if (typeof navigator === "undefined" || !("wakeLock" in navigator)) return
+    let lock: WakeLockSentinel | null = null
+    let cancelled = false
+    const requestWakeLock = async () => {
+      if (cancelled || document.visibilityState !== "visible" || lock) return
+      try {
+        lock = await navigator.wakeLock.request("screen")
+        if (cancelled && lock) {
+          await lock.release()
+          lock = null
+        }
+      } catch {
+        // O navegador pode não oferecer suporte ou bloquear o recurso.
+      }
+    }
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") {
+        lock = null
+        void requestWakeLock()
+      }
+    }
+    void requestWakeLock()
+    document.addEventListener("visibilitychange", handleVisibility)
+    return () => {
+      cancelled = true
+      document.removeEventListener("visibilitychange", handleVisibility)
+      if (lock) void lock.release()
+    }
+  }, [activeKind])
   useEffect(() => {
     if (!company?.slug) return
     let active = true
@@ -57,16 +92,16 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const qrCode = "https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=14&data=" + encodeURIComponent(payload)
   const titles: Record<string, string> = { google: "Avalie nossa", pix: "Pague com Pix!", instagram: "Siga nosso Instagram!", wifi: "Conecte-se ao Wi-Fi!", whatsapp: "Envie um WhatsApp!" }
   const subtitles: Record<string, string> = { google: company.name, pix: pixError || ("Titular: " + (signs.pix?.recipient || company.name)), instagram: "Nosso perfil é " + (signs.instagram?.username || ""), wifi: "Rede: " + (signs.wifi?.network || "") + " · Senha: " + (signs.wifi?.password || ""), whatsapp: "Nosso número: " + (signs.whatsapp?.phone || "") }
-  const openReview = () => { if (kind === "google" || kind === "instagram" || kind === "whatsapp") window.open(kind === "google" ? company.review_url : payload, "_blank", "noopener,noreferrer"); if (kind === "pix" && payload) void navigator.clipboard?.writeText(payload) }
+  const openReview = () => { if (kind === "wifi") { setWifiFocus(value => !value); return } if (kind === "google" || kind === "instagram" || kind === "whatsapp") window.open(kind === "google" ? company.review_url : payload, "_blank", "noopener,noreferrer"); if (kind === "pix" && payload) void navigator.clipboard?.writeText(payload) }
   if (!["google", "pix", "instagram", "wifi", "whatsapp"].includes(kind) || (kind !== "google" && (!cfg?.enabled || !payload))) return <main className="review-page"><section className="review-card"><h1>Placa indisponível</h1><p className="subtitle">Ative e configure esta plaquinha no painel administrativo.</p></section></main>
   return <main className="review-page virtual-sign-page sign-carousel" onTouchStart={e => setTouchStartX(e.touches[0].clientX)} onTouchEnd={e => { if (touchStartX !== null) { const delta = e.changedTouches[0].clientX - touchStartX; if (Math.abs(delta) > 45) changeSlide(delta < 0 ? 1 : -1) } setTouchStartX(null) }}>
-    <section className="review-card" aria-label={"Placa " + kind + " de " + company.name} onClick={openReview}>
+    <section className={"review-card" + (kind === "wifi" && wifiFocus ? " wifi-focus" : "")} aria-label={"Placa " + kind + " de " + company.name} onClick={openReview}>
       {kind === "google" ? <GoogleMark /> : <div className={"google-mark sign-symbol sign-" + kind} aria-label={"Ícone " + kind} role="img"><img className="sign-icon-image" src={`/sign-icons/${kind}.png`} alt="" /></div>}
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>{titles[kind] || titles.google}{kind === "google" ? <><br/>empresa!</> : null}</h1>
       <p className="subtitle">{subtitles[kind] || company.name}</p>
-      <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
-      <p className="qr-label">{kind === "pix" ? (pixError ? "CONFIGURE O PIX NO PAINEL" : "PIX COPIA E COLA · TOQUE PARA COPIAR") : "QR CODE"}</p>
+      <div className="qr-shell" style={kind === "wifi" && wifiFocus ? { transform: "scale(1.2)", margin: "28px auto", position: "relative", zIndex: 2, transition: "transform 180ms ease" } : { transition: "transform 180ms ease" }}><img src={qrCode} alt={kind === "wifi" ? "QR Code para conectar ao Wi-Fi" : `QR Code para avaliar ${company.name} no Google`} style={kind === "wifi" && wifiFocus ? { width: "min(78vw, 360px)", height: "auto" } : undefined} /></div>
+      <p className="qr-label">{kind === "pix" ? (pixError ? "CONFIGURE O PIX NO PAINEL" : "PIX COPIA E COLA · TOQUE PARA COPIAR") : kind === "wifi" ? (wifiFocus ? "MODO DE CONEXÃO · TOQUE PARA VOLTAR" : "TOQUE NA PLACA PARA AMPLIAR O QR CODE") : "QR CODE"}</p>
       <div className="actions">
         <div className="action-item touch-item">
           <div className="scan-icon image-icon"><img src="/touch-icon.png" alt="Ícone de toque" /></div>
