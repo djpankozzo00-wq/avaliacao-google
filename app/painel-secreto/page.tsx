@@ -3,14 +3,14 @@
 import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
-type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }
+type SignConfigs = { pix: { enabled: boolean; pix_key: string; recipient: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }\ntype Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }\nconst emptySigns: SignConfigs = { pix: { enabled: false, pix_key: "", recipient: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
   const [companies, setCompanies] = useState<Company[]>([])
   const [name, setName] = useState("")
   const [reviewUrl, setReviewUrl] = useState("")
-  const [editUrls, setEditUrls] = useState<Record<string, string>>({})
+  const [editUrls, setEditUrls] = useState<Record<string, string>>({})\n  const [editSigns, setEditSigns] = useState<Record<string, SignConfigs>>({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
@@ -22,7 +22,7 @@ export default function AdminPage() {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível carregar as empresas.")
       setCompanies(data)
-      setEditUrls(Object.fromEntries(data.map((company: Company) => [company.id, company.review_url])))
+      setEditUrls(Object.fromEntries(data.map((company: Company) => [company.id, company.review_url])))\n      setEditSigns(Object.fromEntries(data.map((company: Company) => [company.id, { ...emptySigns, ...(company.sign_configs || {}) }])))
       setAuthenticated(true)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao carregar.")
@@ -57,7 +57,7 @@ export default function AdminPage() {
   async function saveLink(company: Company) {
     setError(""); setMessage(""); setLoading(true)
     try {
-      const response = await fetch(`/api/admin/companies/${company.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ review_url: editUrls[company.id] }) })
+      const response = await fetch(`/api/admin/companies/${company.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ review_url: editUrls[company.id], sign_configs: editSigns[company.id] }) })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível salvar.")
       setMessage(`Link de avaliação de ${company.name} atualizado.`)
@@ -93,7 +93,7 @@ export default function AdminPage() {
     catch { setMessage("Não foi possível copiar automaticamente. Selecione e copie o link.") }
   }
 
-  const publicUrl = (slug: string) => typeof window === "undefined" ? `/empresa/${slug}` : `${window.location.origin}/empresa/${slug}`
+  const publicUrl = (slug: string, type = "google") => typeof window === "undefined" ? `/empresa/${slug}?tipo=${type}` : `${window.location.origin}/empresa/${slug}?tipo=${type}`
 
   return (
     <main className="admin-page">
@@ -133,6 +133,22 @@ export default function AdminPage() {
                   <div className="link-row"><input readOnly value={publicUrl(company.slug)} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={`/empresa/${company.slug}`} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
                   <label htmlFor={`review-${company.id}`}>Link de avaliação configurado</label>
                   <input id={`review-${company.id}`} type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} />
+                  <div className="sign-config-editor">
+                    <h4>Configurar outras plaquinhas</h4>
+                    {(["pix", "instagram", "wifi", "whatsapp"] as const).map(kind => {
+                      const cfg = editSigns[company.id]?.[kind] || emptySigns[kind]
+                      const patch = (field: string, value: string | boolean) => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), [kind]: { ...((old[company.id] || emptySigns)[kind]), [field]: value } } as SignConfigs }))
+                      const titles = { pix: "Pagamento Pix", instagram: "Instagram", wifi: "Wi-Fi", whatsapp: "WhatsApp" }
+                      return <div className="sign-config-item" key={kind}>
+                        <label className="sign-enable"><input type="checkbox" checked={cfg.enabled} onChange={e => patch("enabled", e.target.checked)} /> Ativar placa de {titles[kind]}</label>
+                        {kind === "pix" && <><label>Chave Pix</label><input value={cfg.pix_key} onChange={e => patch("pix_key", e.target.value)} placeholder="Chave Pix" /><label>Nome do recebedor</label><input value={cfg.recipient} onChange={e => patch("recipient", e.target.value)} placeholder="Nome exibido na placa" /></>}
+                        {kind === "instagram" && <><label>Usuário do Instagram</label><input value={cfg.username} onChange={e => patch("username", e.target.value)} placeholder="@seuperfil" /><label>Link do perfil</label><input value={cfg.url} onChange={e => patch("url", e.target.value)} placeholder="https://instagram.com/seuperfil" /></>}
+                        {kind === "wifi" && <><label>Nome da rede Wi-Fi</label><input value={cfg.network} onChange={e => patch("network", e.target.value)} placeholder="Nome da rede" /><label>Senha do Wi-Fi</label><input value={cfg.password} onChange={e => patch("password", e.target.value)} placeholder="Senha da rede" /></>}
+                        {kind === "whatsapp" && <><label>Número do WhatsApp (com código do país)</label><input value={cfg.phone} onChange={e => patch("phone", e.target.value)} placeholder="5511999999999" /><label>Mensagem inicial (opcional)</label><input value={cfg.message} onChange={e => patch("message", e.target.value)} placeholder="Olá! Gostaria de mais informações." /></>}
+                        <a className="admin-button secondary" href={publicUrl(company.slug, kind)} target="_blank" rel="noreferrer">Abrir placa {titles[kind]}</a>
+                      </div>
+                    })}
+                  </div>
                   <button className="admin-button primary" type="button" onClick={() => void saveLink(company)} disabled={loading}><Save size={16} /> Salvar link de avaliação</button>
                   <button className="admin-button danger" type="button" onClick={() => void deleteCompany(company)} disabled={loading}><Trash2 size={16} /> Apagar empresa</button>
                 </article>)}
