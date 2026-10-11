@@ -198,7 +198,7 @@ export default function AdminPage() {
                   <p className="admin-muted">Categoria: {place.category}</p>
                   {place.phone && <p className="admin-muted">Telefone público: {place.phone}</p>}
                   <div className="link-row">
-                    {place.whatsapp_url ? <a className="admin-button primary" href={place.whatsapp_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Abrir WhatsApp</a> : place.phone ? <a className="admin-button primary" href={"tel:" + place.phone.replace(/[^0-9+]/g, "")}><ExternalLink size={16} /> Ligar para telefone</a> : <span className="admin-muted">Telefone/WhatsApp não informado publicamente</span>}{place.phone && place.whatsapp_url && <a className="admin-button secondary" href={"tel:" + place.phone.replace(/[^0-9+]/g, "")}><ExternalLink size={16} /> Ligar</a>}
+                    {place.phone ? <><a className="admin-button primary" href={place.whatsapp_url || ("https://wa.me/" + (place.phone.replace(/[^0-9]/g, "").startsWith("55") ? place.phone.replace(/[^0-9]/g, "") : "55" + place.phone.replace(/[^0-9]/g, "")))} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Abrir WhatsApp</a><a className="admin-button secondary" href={"tel:" + place.phone.replace(/[^0-9+]/g, "")}><ExternalLink size={16} /> Ligar</a></> : <span className="admin-muted">Telefone/WhatsApp não informado publicamente</span>}
                     <a className="admin-button secondary" href={place.maps_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Ver no Google Maps</a>
                   </div>
                 </article>)}
