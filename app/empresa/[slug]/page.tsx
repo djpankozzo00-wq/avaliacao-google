@@ -11,24 +11,23 @@ function GoogleMark() {
 
 
 function HandPhone({ scan = false }: { scan?: boolean }) {
-  return <svg className="hand-phone" viewBox="0 0 100 112" aria-hidden="true">
-    <g fill="none" stroke="#2454c5" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M26 24 C26 18 30 14 36 14 H61 C67 14 71 18 71 24 V84 C71 90 67 94 61 94 H36 C30 94 26 90 26 84 Z"/>
-      <path d="M39 19 H57 Q60 19 60 22 V24 H36 V22 Q36 19 39 19Z"/>
-      <path d="M44 88 H54"/>
-      <path d="M26 34 L18 39 Q14 42 14 49 V75 Q14 81 9 87 L4 93 Q1 97 4 100 Q7 103 11 99 L20 90 Q25 85 25 78"/>
-      <path d="M71 36 Q79 30 83 36 Q86 41 81 46 L73 53"/>
-      <path d="M72 49 Q81 44 85 50 Q88 55 82 60 L72 66"/>
-      <path d="M72 62 Q80 59 83 65 Q85 70 79 74 L71 78"/>
-      <path d="M26 72 Q19 72 18 78 Q17 84 24 86 L37 88"/>
-      <path d="M38 94 L34 101 Q32 105 36 107 Q40 109 43 104 L48 96"/>
+  if (scan) return <svg className="hand-phone" viewBox="0 0 100 150" aria-hidden="true">
+    <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="18" y="4" width="64" height="142" rx="16" />
+      <path d="M37 9h26q4 0 4 5v3q0 6-6 6H39q-6 0-6-6v-3q0-5 4-5Z" />
+      <path d="M40 139h20" />
+      <path d="M18 38H9Q3 38 3 47v20 M82 38h9q6 0 6 9v20 M18 107H9q-6 0-6-9v-8 M82 107h9q6 0 6-9v-8" />
+      <path d="M29 42h18v18H29z M53 42h18v18H53z M29 68h18v18H29z" />
+      <path d="M51 67h4v4h-4z M58 66h4v8h-4z M65 68h5v4h-5z M51 76h7v4h-7z M61 78h4v8h-4z M51 84h4v5h-4z M68 79h4v10h-4z M54 91h4v5h-4z M62 92h9v4h-9z" />
     </g>
-    {scan ? <g fill="none" stroke="#fff" strokeWidth="1.7" strokeLinejoin="round">
-      <path d="M35 43h9v9h-9z M55 43h9v9h-9z M35 63h9v9h-9z"/>
-      <path d="M48 43h4v4h-4z M46 51h4v4h-4z M52 54h4v4h-4z M47 60h4v4h-4z M54 64h4v4h-4z M60 58h4v4h-4z M48 70h4v4h-4z M59 70h5v4h-5z"/>
-    </g> : <g fill="none" stroke="#2454c5" strokeWidth="2.8" strokeLinecap="round">
-      <path d="M34 52 Q48 37 62 52"/><path d="M39 58 Q48 48 57 58"/><path d="M45 64 Q48 61 51 64"/><path d="M47 66 L49 68"/>
-    </g>}
+    <path d="M8 75H92" stroke="#e74759" strokeWidth="3.5" strokeLinecap="round"/>
+  </svg>
+  return <svg className="hand-phone" viewBox="0 0 100 150" aria-hidden="true">
+    <g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17 64A34 34 0 0 1 83 64" stroke="#4b4b4b" strokeWidth="7"/>
+      <path d="M29 64a22 22 0 0 1 42 0" stroke="#4b4b4b" strokeWidth="7"/>
+      <path d="M43 118 25 92q-5-8 2-12 7-4 12 4l5 8V58q0-8 7-8t7 8v22q7-8 13 0 7-3 10 5 8-1 8 8v24q0 10-9 16v10H44v-15Z" stroke="#080808" strokeWidth="7"/>
+    </g>
   </svg>
 }
 
