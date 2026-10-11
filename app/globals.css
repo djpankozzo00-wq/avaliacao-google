@@ -456,3 +456,41 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
     height: 76px !important;
   }
 }
+
+
+/* Navegação entre plaquinhas por gesto lateral ou controles discretos */
+.sign-carousel { touch-action: pan-y; }
+.sign-carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: 100%;
+  margin-top: 12px;
+  position: relative;
+  z-index: 2;
+}
+.sign-carousel-controls > button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(229,201,141,.55);
+  border-radius: 50%;
+  color: #e5c98d;
+  background: rgba(0,0,0,.25);
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+}
+.sign-carousel-dots { display: flex; align-items: center; gap: 8px; }
+.sign-carousel-dots button {
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(229,201,141,.4);
+  cursor: pointer;
+}
+.sign-carousel-dots button.active { width: 18px; border-radius: 8px; background: #e5c98d; }
