@@ -276,3 +276,37 @@ html, body { min-height: 100%; }
   .virtual-sign-page { align-items: flex-start; }
   .virtual-sign-page .review-card { min-height: 0; }
 }
+
+
+/* Correção de centralização: ocupa a viewport inteira no mobile */
+html, body { margin: 0; min-height: 100%; }
+body:has(.virtual-sign-page) { min-height: 100svh; }
+.virtual-sign-page {
+  position: relative;
+  min-height: 100vh !important;
+  min-height: 100dvh !important;
+  height: auto;
+  width: 100%;
+  margin: 0 !important;
+  padding: 16px 12px !important;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+.virtual-sign-page > .review-card {
+  position: relative;
+  inset: auto;
+  margin: auto !important;
+  transform: none !important;
+  flex-shrink: 0;
+  align-self: center !important;
+}
+@media (max-height: 850px) {
+  .virtual-sign-page { justify-content: flex-start !important; }
+  .virtual-sign-page > .review-card { margin-top: 0 !important; margin-bottom: 0 !important; }
+}
+@media (min-height: 851px) {
+  .virtual-sign-page { justify-content: center !important; }
+}
