@@ -145,6 +145,7 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
 .scan-icon.image-icon img { display: block; width: 100%; height: 100%; object-fit: contain; }
 .virtual-sign-page .touch-item .scan-icon.image-icon img,
 .virtual-sign-page .scan-item .scan-icon.image-icon img { filter: none; }
+.virtual-sign-page .touch-item .scan-icon.image-icon img { transform: scale(1.28); }
 .actions { width: min(100%, 330px); gap: 10px; justify-content: space-between; align-items: flex-start; }
 .action-item { flex: 1; min-width: 0; gap: 7px; }
 .touch-item .scan-icon, .scan-item .scan-icon { height: 112px; }
