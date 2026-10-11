@@ -15,10 +15,21 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const [notFound, setNotFound] = useState(false)
   const [activeKind, setActiveKind] = useState("google")
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const [pixCopyPaste, setPixCopyPaste] = useState("")
+  const [pixError, setPixError] = useState("")
   useEffect(() => {
     const requested = new URLSearchParams(window.location.search).get("tipo")
     if (requested && ["google", "pix", "instagram", "wifi", "whatsapp"].includes(requested)) setActiveKind(requested)
   }, [])
+  useEffect(() => {
+    if (!company?.slug) return
+    let active = true
+    fetch(`/api/companies/${encodeURIComponent(company.slug)}/pix`, { cache: "no-store" })
+      .then(async response => { const data = await response.json(); if (!response.ok) throw new Error(data.error || "Não foi possível gerar o Pix."); return data })
+      .then(data => { if (active) { setPixCopyPaste(data.pixCopiaECola || ""); setPixError("") } })
+      .catch(error => { if (active) { setPixCopyPaste(""); setPixError(error.message || "Não foi possível gerar o Pix.") } })
+    return () => { active = false }
+  }, [company?.slug, company?.sign_configs])
   useEffect(() => {
     let active = true
     params.then(({ slug }) => fetch(`/api/companies/${encodeURIComponent(slug)}`, { cache: "no-store" }))
@@ -38,10 +49,10 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   }
   const cfg = signs[kind]
   const phone = String(signs.whatsapp?.phone || "").replace(/[^0-9]/g, "")
-  const payload = kind === "google" ? company.review_url : kind === "pix" ? (signs.pix?.pix_key || "") : kind === "instagram" ? (signs.instagram?.url || ("https://instagram.com/" + String(signs.instagram?.username || "").replace(/^@/, ""))) : kind === "wifi" ? ("WIFI:T:WPA;S:" + (signs.wifi?.network || "") + ";P:" + (signs.wifi?.password || "") + ";;") : ("https://wa.me/" + phone + (signs.whatsapp?.message ? "?text=" + encodeURIComponent(signs.whatsapp.message) : ""))
+  const payload = kind === "google" ? company.review_url : kind === "pix" ? pixCopyPaste : kind === "instagram" ? (signs.instagram?.url || ("https://instagram.com/" + String(signs.instagram?.username || "").replace(/^@/, ""))) : kind === "wifi" ? ("WIFI:T:WPA;S:" + (signs.wifi?.network || "") + ";P:" + (signs.wifi?.password || "") + ";;") : ("https://wa.me/" + phone + (signs.whatsapp?.message ? "?text=" + encodeURIComponent(signs.whatsapp.message) : ""))
   const qrCode = "https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=14&data=" + encodeURIComponent(payload)
   const titles: Record<string, string> = { google: "Avalie nossa", pix: "Pague com Pix!", instagram: "Siga nosso Instagram!", wifi: "Conecte-se ao Wi-Fi!", whatsapp: "Envie um WhatsApp!" }
-  const subtitles: Record<string, string> = { google: company.name, pix: "Chave Pix: " + (signs.pix?.pix_key || ""), instagram: "Nosso perfil é " + (signs.instagram?.username || ""), wifi: "Rede: " + (signs.wifi?.network || "") + " · Senha: " + (signs.wifi?.password || ""), whatsapp: "Nosso número: " + (signs.whatsapp?.phone || "") }
+  const subtitles: Record<string, string> = { google: company.name, pix: pixError || ("Titular: " + (signs.pix?.recipient || company.name)), instagram: "Nosso perfil é " + (signs.instagram?.username || ""), wifi: "Rede: " + (signs.wifi?.network || "") + " · Senha: " + (signs.wifi?.password || ""), whatsapp: "Nosso número: " + (signs.whatsapp?.phone || "") }
   const openReview = () => { if (kind === "google" || kind === "instagram" || kind === "whatsapp") window.open(kind === "google" ? company.review_url : payload, "_blank", "noopener,noreferrer"); if (kind === "pix" && payload) void navigator.clipboard?.writeText(payload) }
   if (!["google", "pix", "instagram", "wifi", "whatsapp"].includes(kind) || (kind !== "google" && (!cfg?.enabled || !payload))) return <main className="review-page"><section className="review-card"><h1>Placa indisponível</h1><p className="subtitle">Ative e configure esta plaquinha no painel administrativo.</p></section></main>
   return <main className="review-page virtual-sign-page sign-carousel" onTouchStart={e => setTouchStartX(e.touches[0].clientX)} onTouchEnd={e => { if (touchStartX !== null) { const delta = e.changedTouches[0].clientX - touchStartX; if (Math.abs(delta) > 45) changeSlide(delta < 0 ? 1 : -1) } setTouchStartX(null) }}>
@@ -51,7 +62,7 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <h1>{titles[kind] || titles.google}{kind === "google" ? <><br/>empresa!</> : null}</h1>
       <p className="subtitle">{subtitles[kind] || company.name}</p>
       <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
-      <p className="qr-label">{kind === "pix" ? "QR CODE · TOQUE PARA COPIAR" : "QR CODE"}</p>
+      <p className="qr-label">{kind === "pix" ? (pixError ? "CONFIGURE O PIX NO PAINEL" : "PIX COPIA E COLA · TOQUE PARA COPIAR") : "QR CODE"}</p>
       <div className="actions">
         <div className="action-item touch-item">
           <div className="scan-icon image-icon"><img src="/touch-icon.png" alt="Ícone de toque" /></div>
