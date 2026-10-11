@@ -168,7 +168,7 @@ export default function AdminPage() {
                   if (!response.ok) throw new Error(data.error || "Não foi possível procurar empresas.")
                   setEstablishments(Array.isArray(data.results) ? data.results : [])
                   if (!data.results?.length) setEstablishmentsMessage("Nenhuma empresa encontrada com esses dados. Tente outra categoria ou cidade.")
-                  else if (data.notice) setEstablishmentsMessage(data.notice)
+                  else setEstablishmentsMessage(`${data.results.length} empresas encontradas após ampliar a busca e remover duplicados. ${data.notice || ""}`.trim())
                 } catch (e) {
                   setEstablishmentsMessage(e instanceof Error ? e.message : "Não foi possível procurar empresas.")
                 } finally {
