@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 
 
-type Company = { name: string; slug: string; review_url: string }
+type Company = { name: string; slug: string; review_url: string; sign_configs?: any }
 
 function GoogleMark() {
   return <svg className="google-mark" viewBox="0 0 48 48" aria-label="Google" role="img"><path fill="#4285F4" d="M47.5 24.55c0-1.64-.15-3.22-.42-4.74H24v8.97h13.18a11.27 11.27 0 0 1-4.9 7.4v6.18h7.94c4.65-4.28 7.28-10.58 7.28-17.81Z"/><path fill="#34A853" d="M24 48c6.64 0 12.2-2.2 16.27-5.64l-7.94-6.18c-2.2 1.47-5 2.34-8.33 2.34-6.4 0-11.82-4.32-13.76-10.13H2.03v6.38A24.58 24.58 0 0 0 24 48Z"/><path fill="#FBBC05" d="M10.24 28.39A14.76 14.76 0 0 1 9.47 24c0-1.52.27-3 .77-4.39v-6.38H2.03A24.02 24.02 0 0 0 0 24c0 3.88.93 7.55 2.03 10.77l8.21-6.38Z"/><path fill="#EA4335" d="M24 9.48c3.62 0 6.87 1.25 9.43 3.7l7.07-7.07C36.18 2.2 30.64 0 24 0A24.58 24.58 0 0 0 2.03 13.23l8.21 6.38C12.18 13.8 17.6 9.48 24 9.48Z"/></svg>
@@ -23,16 +23,25 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   }, [params])
   if (!company && !notFound) return <main className="review-page"><section className="review-card"><p className="subtitle">Carregando avaliação...</p></section></main>
   if (!company) return <main className="review-page"><section className="review-card"><h1>Link não encontrado</h1><p className="subtitle">Confira o endereço com a empresa.</p></section></main>
-  const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=14&data=${encodeURIComponent(company.review_url)}`
-  const openReview = () => window.open(company.review_url, "_blank", "noopener,noreferrer")
+  const params = new URLSearchParams(window.location.search)
+  const kind = params.get("tipo") || "google"
+  const signs = company.sign_configs || {}
+  const cfg = signs[kind]
+  const phone = String(signs.whatsapp?.phone || "").replace(/[^0-9]/g, "")
+  const payload = kind === "google" ? company.review_url : kind === "pix" ? (signs.pix?.pix_key || "") : kind === "instagram" ? (signs.instagram?.url || ("https://instagram.com/" + String(signs.instagram?.username || "").replace(/^@/, ""))) : kind === "wifi" ? ("WIFI:T:WPA;S:" + (signs.wifi?.network || "") + ";P:" + (signs.wifi?.password || "") + ";;") : ("https://wa.me/" + phone + (signs.whatsapp?.message ? "?text=" + encodeURIComponent(signs.whatsapp.message) : ""))
+  const qrCode = "https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=14&data=" + encodeURIComponent(payload)
+  const titles: Record<string, string> = { google: "Avalie nossa", pix: "Pague com Pix!", instagram: "Siga nosso Instagram!", wifi: "Conecte-se ao Wi-Fi!", whatsapp: "Envie um WhatsApp!" }
+  const subtitles: Record<string, string> = { google: company.name, pix: "Chave Pix: " + (signs.pix?.pix_key || ""), instagram: "Nosso perfil é " + (signs.instagram?.username || ""), wifi: "Rede: " + (signs.wifi?.network || "") + " · Senha: " + (signs.wifi?.password || ""), whatsapp: "Nosso número: " + (signs.whatsapp?.phone || "") }
+  const openReview = () => { if (kind === "google" || kind === "instagram" || kind === "whatsapp") window.open(kind === "google" ? company.review_url : payload, "_blank", "noopener,noreferrer"); if (kind === "pix" && payload) void navigator.clipboard?.writeText(payload) }
+  if (!["google", "pix", "instagram", "wifi", "whatsapp"].includes(kind) || (kind !== "google" && (!cfg?.enabled || !payload))) return <main className="review-page"><section className="review-card"><h1>Placa indisponível</h1><p className="subtitle">Ative e configure esta plaquinha no painel administrativo.</p></section></main>
   return <main className="review-page virtual-sign-page" onClick={openReview}>
-    <section className="review-card" aria-label={`Placa de avaliação de ${company.name}`}>
-      <GoogleMark />
+    <section className="review-card" aria-label={"Placa " + kind + " de " + company.name}>
+      {kind === "google" ? <GoogleMark /> : <div className="google-mark sign-symbol">{kind === "pix" ? "Pix" : kind === "instagram" ? "◎" : kind === "wifi" ? "⌁" : "●"}</div>}
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
-      <h1>Avalie nossa<br/>empresa!</h1>
-      <p className="subtitle">{company.name}</p>
+      <h1>{titles[kind] || titles.google}{kind === "google" ? <><br/>empresa!</> : null}</h1>
+      <p className="subtitle">{subtitles[kind] || company.name}</p>
       <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
-      <p className="qr-label">QR CODE</p>
+      <p className="qr-label">{kind === "pix" ? "QR CODE · TOQUE PARA COPIAR" : "QR CODE"}</p>
       <div className="actions">
         <div className="action-item touch-item">
           <div className="scan-icon image-icon"><img src="/touch-icon.png" alt="Ícone de toque" /></div>
