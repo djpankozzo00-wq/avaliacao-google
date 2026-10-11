@@ -3,14 +3,17 @@
 import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
-type SignConfigs = { pix: { enabled: boolean; pix_key: string; recipient: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }\ntype Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }\nconst emptySigns: SignConfigs = { pix: { enabled: false, pix_key: "", recipient: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
+type SignConfigs = { pix: { enabled: boolean; pix_key: string; recipient: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
+type Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }
+const emptySigns: SignConfigs = { pix: { enabled: false, pix_key: "", recipient: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
   const [companies, setCompanies] = useState<Company[]>([])
   const [name, setName] = useState("")
   const [reviewUrl, setReviewUrl] = useState("")
-  const [editUrls, setEditUrls] = useState<Record<string, string>>({})\n  const [editSigns, setEditSigns] = useState<Record<string, SignConfigs>>({})
+  const [editUrls, setEditUrls] = useState<Record<string, string>>({})
+  const [editSigns, setEditSigns] = useState<Record<string, SignConfigs>>({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
@@ -22,7 +25,8 @@ export default function AdminPage() {
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível carregar as empresas.")
       setCompanies(data)
-      setEditUrls(Object.fromEntries(data.map((company: Company) => [company.id, company.review_url])))\n      setEditSigns(Object.fromEntries(data.map((company: Company) => [company.id, { ...emptySigns, ...(company.sign_configs || {}) }])))
+      setEditUrls(Object.fromEntries(data.map((company: Company) => [company.id, company.review_url])))
+      setEditSigns(Object.fromEntries(data.map((company: Company) => [company.id, { ...emptySigns, ...(company.sign_configs || {}) }])))
       setAuthenticated(true)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao carregar.")
