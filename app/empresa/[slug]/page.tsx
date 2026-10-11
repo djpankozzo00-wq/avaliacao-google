@@ -16,6 +16,10 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const [activeKind, setActiveKind] = useState("google")
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("tipo")
+    if (requested && ["google", "pix", "instagram", "wifi", "whatsapp"].includes(requested)) setActiveKind(requested)
+  }, [])
+  useEffect(() => {
     let active = true
     params.then(({ slug }) => fetch(`/api/companies/${encodeURIComponent(slug)}`, { cache: "no-store" }))
       .then(async response => { if (!response.ok) throw new Error("Empresa não encontrada"); return response.json() })
@@ -28,10 +32,6 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const signs = company.sign_configs || {}
   const availableKinds = ["google", "pix", "instagram", "wifi", "whatsapp"].filter(item => item === "google" || (signs[item]?.enabled && (item === "pix" ? signs.pix?.pix_key : item === "instagram" ? (signs.instagram?.url || signs.instagram?.username) : item === "wifi" ? signs.wifi?.network : signs.whatsapp?.phone)))
   const kind = availableKinds.includes(activeKind) ? activeKind : "google"
-  useEffect(() => {
-    const requested = new URLSearchParams(window.location.search).get("tipo")
-    if (requested && ["google", "pix", "instagram", "wifi", "whatsapp"].includes(requested)) setActiveKind(requested)
-  }, [])
   const changeSlide = (direction: number) => {
     const index = availableKinds.indexOf(kind)
     setActiveKind(availableKinds[(index + direction + availableKinds.length) % availableKinds.length])
