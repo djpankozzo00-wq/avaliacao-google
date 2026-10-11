@@ -1,11 +1,9 @@
 "use client"
 
 import { FormEvent, useCallback, useEffect, useState } from "react"
-import { Copy, ExternalLink, LogOut, MapPin, Plus, RefreshCw, Save, Search, ShieldCheck, Trash2 } from "lucide-react"
+import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
 type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }
-type Establishment = { id: string; name: string; address: string; maps_url: string; category: string; phone?: string; whatsapp_url?: string }
-
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
@@ -16,15 +14,6 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
-  const [establishmentState, setEstablishmentState] = useState("BA")
-  const [establishmentCity, setEstablishmentCity] = useState("Macaúbas")
-  const [municipalities, setMunicipalities] = useState<string[]>([])
-  const [establishmentCategory, setEstablishmentCategory] = useState("todas")
-  const [whatsappOnly, setWhatsappOnly] = useState(false)
-  const [establishments, setEstablishments] = useState<Establishment[]>([])
-  const [establishmentsLoading, setEstablishmentsLoading] = useState(false)
-  const [establishmentsMessage, setEstablishmentsMessage] = useState("")
-
   const loadCompanies = useCallback(async () => {
     setLoading(true)
     try {
@@ -41,27 +30,6 @@ export default function AdminPage() {
   }, [])
 
   useEffect(() => { void loadCompanies() }, [loadCompanies])
-
-  useEffect(() => {
-    let active = true
-    setMunicipalities([])
-    setEstablishmentCity("")
-    if (!establishmentState) return
-    fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${establishmentState}/municipios?orderBy=nome`)
-      .then(response => {
-        if (!response.ok) throw new Error("Não foi possível carregar os municípios.")
-        return response.json()
-      })
-      .then((data: Array<{ nome: string }>) => {
-        if (active) {
-          const names = data.map(item => item.nome)
-          setMunicipalities(names)
-          setEstablishmentCity(names.includes("Macaúbas") && establishmentState === "BA" ? "Macaúbas" : names[0] || "")
-        }
-      })
-      .catch(() => { if (active) setEstablishmentsMessage("Não foi possível carregar a lista de municípios. Verifique sua conexão e selecione o estado novamente.") })
-    return () => { active = false }
-  }, [establishmentState])
 
   async function login(event: FormEvent) {
     event.preventDefault(); setError(""); setMessage(""); setLoading(true)
@@ -171,72 +139,7 @@ export default function AdminPage() {
               </div>}
             </section>
 
-                        <section className="admin-panel">
-              <h2><MapPin size={20} /> Buscar empresas por cidade e categoria</h2>
-              <p>Informe a cidade e o estado. Digite “todas” para buscar diferentes tipos de estabelecimentos ou escolha uma categoria específica. A busca usa OpenStreetMap e Overpass, sem exigir chave paga. Os resultados mostram contatos públicos e atalho para WhatsApp quando houver número disponível.</p>
-              <form onSubmit={async event => {
-                event.preventDefault()
-                const stateName = ({ AC: "Acre", AL: "Alagoas", AP: "Amapá", AM: "Amazonas", BA: "Bahia", CE: "Ceará", DF: "Distrito Federal", ES: "Espírito Santo", GO: "Goiás", MA: "Maranhão", MT: "Mato Grosso", MS: "Mato Grosso do Sul", MG: "Minas Gerais", PA: "Pará", PB: "Paraíba", PR: "Paraná", PE: "Pernambuco", PI: "Piauí", RJ: "Rio de Janeiro", RN: "Rio Grande do Norte", RS: "Rio Grande do Sul", RO: "Rondônia", RR: "Roraima", SC: "Santa Catarina", SP: "São Paulo", SE: "Sergipe", TO: "Tocantins" } as Record<string, string>)[establishmentState]
-                const city = establishmentCity.trim() + (stateName ? ", " + stateName : "")
-                const category = establishmentCategory.trim()
-                if (city.length < 2 || category.length < 2) {
-                  setEstablishmentsMessage("Informe a cidade e a categoria da empresa.")
-                  return
-                }
-                setEstablishmentsLoading(true)
-                setEstablishments([])
-                setEstablishmentsMessage("")
-                try {
-                  const params = new URLSearchParams({ city, category, whatsappOnly: String(whatsappOnly) })
-                  const response = await fetch("/api/admin/companies/search-establishments?" + params.toString(), { cache: "no-store" })
-                  const data = await response.json()
-                  if (!response.ok) throw new Error(data.error || "Não foi possível procurar empresas.")
-                  setEstablishments(Array.isArray(data.results) ? data.results : [])
-                  if (!data.results?.length) setEstablishmentsMessage("Nenhuma empresa encontrada com esses dados. Tente outra categoria ou cidade.")
-                  else setEstablishmentsMessage(`${data.results.length} empresas encontradas após ampliar a busca e remover duplicados. ${data.notice || ""}`.trim())
-                } catch (e) {
-                  setEstablishmentsMessage(e instanceof Error ? e.message : "Não foi possível procurar empresas.")
-                } finally {
-                  setEstablishmentsLoading(false)
-                }
-              }}>
-                <label htmlFor="establishment-state">Estado</label>
-                <select id="establishment-state" value={establishmentState} onChange={e => setEstablishmentState(e.target.value)} required>
-                  <option value="">Selecione um estado</option>
-                  <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option><option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option><option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option><option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option><option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option><option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option><option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option><option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option><option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option>
-                </select>
-                <label htmlFor="establishment-city">Cidade</label>
-                <select id="establishment-city" value={establishmentCity} onChange={e => setEstablishmentCity(e.target.value)} required disabled={!municipalities.length}>
-                  <option value="">{municipalities.length ? "Selecione uma cidade" : "Carregando cidades..."}</option>
-                  {municipalities.map(municipality => <option key={municipality} value={municipality}>{municipality}</option>)}
-                </select>
-                <label htmlFor="establishment-category">Categoria de empresa</label>
-                <input id="establishment-category" value={establishmentCategory} onChange={e => setEstablishmentCategory(e.target.value)} placeholder="Digite todas ou uma categoria específica" minLength={2} required />
-                <label className="admin-muted" style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 12 }}>
-                  <input type="checkbox" checked={whatsappOnly} onChange={e => setWhatsappOnly(e.target.checked)} />
-                  Mostrar somente empresas com telefone ou WhatsApp público
-                </label>
-                <button className="admin-button primary" type="submit" disabled={establishmentsLoading}>
-                  <Search size={16} /> {establishmentsLoading ? "Buscando empresas..." : "Gerar lista de empresas"}
-                </button>
-                <p className="admin-muted">Fonte: OpenStreetMap / Overpass (gratuito, sujeito aos limites dos servidores públicos). O filtro inclui empresas com telefone público; quando disponível, você pode abrir o WhatsApp ou ligar para o número. Para buscar todos os tipos, use “todas”; você também pode buscar restaurante, barbearia, salão de beleza, mercado, oficina mecânica e outras categorias.</p>
-              </form>
-              {establishmentsLoading && <p className="admin-muted" role="status">Procurando empresas...</p>}
-              {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
-              {establishments.length > 0 && <div className="company-list">
-                {establishments.map(place => <article className="company-item" key={place.id}>
-                  <h3>{place.name}</h3>
-                  <p className="admin-muted">{place.address}</p>
-                  <p className="admin-muted">Categoria: {place.category}</p>
-                  {place.phone && <p className="admin-muted">Telefone público: {place.phone}</p>}
-                  <div className="link-row">
-                    {place.phone ? <><a className="admin-button primary" href={place.whatsapp_url || ("https://wa.me/" + (place.phone.replace(/[^0-9]/g, "").startsWith("55") ? place.phone.replace(/[^0-9]/g, "") : "55" + place.phone.replace(/[^0-9]/g, "")))} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Abrir WhatsApp</a><a className="admin-button secondary" href={"tel:" + place.phone.replace(/[^0-9+]/g, "")}><ExternalLink size={16} /> Ligar</a></> : <span className="admin-muted">Telefone/WhatsApp não informado publicamente</span>}
-                    <a className="admin-button secondary" href={place.maps_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Ver no Google Maps</a>
-                  </div>
-                </article>)}
-              </div>}
-            </section>
-          </>
+                      </>
         )}
         {message && <p className="admin-success" role="status">{message}</p>}
         {error && authenticated && <p className="admin-error" role="alert">{error}</p>}
