@@ -13,6 +13,8 @@ function GoogleMark() {
 export default function CompanyReviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const [company, setCompany] = useState<Company | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [activeKind, setActiveKind] = useState("google")
+  const [touchStartX, setTouchStartX] = useState<number | null>(null)
   useEffect(() => {
     let active = true
     params.then(({ slug }) => fetch(`/api/companies/${encodeURIComponent(slug)}`, { cache: "no-store" }))
@@ -23,9 +25,17 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   }, [params])
   if (!company && !notFound) return <main className="review-page"><section className="review-card"><p className="subtitle">Carregando avaliação...</p></section></main>
   if (!company) return <main className="review-page"><section className="review-card"><h1>Link não encontrado</h1><p className="subtitle">Confira o endereço com a empresa.</p></section></main>
-  const searchParams = new URLSearchParams(window.location.search)
-  const kind = searchParams.get("tipo") || "google"
   const signs = company.sign_configs || {}
+  const availableKinds = ["google", "pix", "instagram", "wifi", "whatsapp"].filter(item => item === "google" || (signs[item]?.enabled && (item === "pix" ? signs.pix?.pix_key : item === "instagram" ? (signs.instagram?.url || signs.instagram?.username) : item === "wifi" ? signs.wifi?.network : signs.whatsapp?.phone)))
+  const kind = availableKinds.includes(activeKind) ? activeKind : "google"
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("tipo")
+    if (requested && ["google", "pix", "instagram", "wifi", "whatsapp"].includes(requested)) setActiveKind(requested)
+  }, [])
+  const changeSlide = (direction: number) => {
+    const index = availableKinds.indexOf(kind)
+    setActiveKind(availableKinds[(index + direction + availableKinds.length) % availableKinds.length])
+  }
   const cfg = signs[kind]
   const phone = String(signs.whatsapp?.phone || "").replace(/[^0-9]/g, "")
   const payload = kind === "google" ? company.review_url : kind === "pix" ? (signs.pix?.pix_key || "") : kind === "instagram" ? (signs.instagram?.url || ("https://instagram.com/" + String(signs.instagram?.username || "").replace(/^@/, ""))) : kind === "wifi" ? ("WIFI:T:WPA;S:" + (signs.wifi?.network || "") + ";P:" + (signs.wifi?.password || "") + ";;") : ("https://wa.me/" + phone + (signs.whatsapp?.message ? "?text=" + encodeURIComponent(signs.whatsapp.message) : ""))
