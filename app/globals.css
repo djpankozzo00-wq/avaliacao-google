@@ -310,3 +310,63 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
 @media (min-height: 851px) {
   .virtual-sign-page { justify-content: center !important; }
 }
+
+
+/* Ajuste mobile: placa inteira centralizada e conteúdo proporcional */
+@media (max-width: 520px) {
+  .virtual-sign-page {
+    min-height: 100dvh !important;
+    height: auto !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 10px 12px !important;
+  }
+  .virtual-sign-page > .review-card {
+    width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: auto !important;
+    padding: 20px 16px 18px !important;
+  }
+  .virtual-sign-page .google-mark {
+    width: 66px !important;
+    margin-bottom: 12px !important;
+  }
+  .virtual-sign-page h1 {
+    font-size: clamp(30px, 7.5vw, 39px) !important;
+    line-height: 1.02 !important;
+    margin: 12px 0 16px !important;
+  }
+  .virtual-sign-page .subtitle {
+    font-size: 16px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 16px !important;
+  }
+  .virtual-sign-page .qr-shell {
+    width: min(66vw, 250px) !important;
+    padding: 10px !important;
+  }
+  .virtual-sign-page .qr-label {
+    margin-top: 8px !important;
+    font-size: 20px !important;
+  }
+  .virtual-sign-page .actions {
+    margin: 4px 0 12px !important;
+    width: min(100%, 300px) !important;
+  }
+  .virtual-sign-page .scan-icon,
+  .virtual-sign-page .hand-phone {
+    width: 78px !important;
+    height: 86px !important;
+  }
+  .virtual-sign-page .action-item span {
+    font-size: 18px !important;
+  }
+  .virtual-sign-page .or {
+    margin-top: 22px !important;
+    font-size: 20px !important;
+  }
+  .virtual-sign-page .powered {
+    font-size: 16px !important;
+  }
+}
