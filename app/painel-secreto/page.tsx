@@ -17,7 +17,7 @@ export default function AdminPage() {
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
   const [establishmentCity, setEstablishmentCity] = useState("Macaúbas, Bahia")
-  const [establishmentCategory, setEstablishmentCategory] = useState("restaurante")
+  const [establishmentCategory, setEstablishmentCategory] = useState("todas")
   const [whatsappOnly, setWhatsappOnly] = useState(false)
   const [establishments, setEstablishments] = useState<Establishment[]>([])
   const [establishmentsLoading, setEstablishmentsLoading] = useState(false)
@@ -150,7 +150,7 @@ export default function AdminPage() {
 
                         <section className="admin-panel">
               <h2><MapPin size={20} /> Buscar empresas por cidade e categoria</h2>
-              <p>Informe a cidade e o tipo de empresa. A busca usa OpenStreetMap e Overpass, sem exigir chave paga. Os resultados mostram contatos públicos e atalho para WhatsApp quando houver número disponível.</p>
+              <p>Informe a cidade e o estado. Digite “todas” para buscar diferentes tipos de estabelecimentos ou escolha uma categoria específica. A busca usa OpenStreetMap e Overpass, sem exigir chave paga. Os resultados mostram contatos públicos e atalho para WhatsApp quando houver número disponível.</p>
               <form onSubmit={async event => {
                 event.preventDefault()
                 const city = establishmentCity.trim()
@@ -179,7 +179,7 @@ export default function AdminPage() {
                 <label htmlFor="establishment-city">Cidade, estado ou país</label>
                 <input id="establishment-city" value={establishmentCity} onChange={e => setEstablishmentCity(e.target.value)} placeholder="Ex.: Macaúbas, Bahia" minLength={2} required />
                 <label htmlFor="establishment-category">Categoria de empresa</label>
-                <input id="establishment-category" value={establishmentCategory} onChange={e => setEstablishmentCategory(e.target.value)} placeholder="Ex.: restaurante, barbearia, oficina..." minLength={2} required />
+                <input id="establishment-category" value={establishmentCategory} onChange={e => setEstablishmentCategory(e.target.value)} placeholder="Digite todas ou uma categoria específica" minLength={2} required />
                 <label className="admin-muted" style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 12 }}>
                   <input type="checkbox" checked={whatsappOnly} onChange={e => setWhatsappOnly(e.target.checked)} />
                   Mostrar somente empresas com telefone ou WhatsApp público
@@ -187,7 +187,7 @@ export default function AdminPage() {
                 <button className="admin-button primary" type="submit" disabled={establishmentsLoading}>
                   <Search size={16} /> {establishmentsLoading ? "Buscando empresas..." : "Gerar lista de empresas"}
                 </button>
-                <p className="admin-muted">Fonte: OpenStreetMap / Overpass (gratuito, sujeito aos limites dos servidores públicos). O filtro inclui empresas com telefone público; quando disponível, você pode abrir o WhatsApp ou ligar para o número. Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica.</p>
+                <p className="admin-muted">Fonte: OpenStreetMap / Overpass (gratuito, sujeito aos limites dos servidores públicos). O filtro inclui empresas com telefone público; quando disponível, você pode abrir o WhatsApp ou ligar para o número. Para buscar todos os tipos, use “todas”; você também pode buscar restaurante, barbearia, salão de beleza, mercado, oficina mecânica e outras categorias.</p>
               </form>
               {establishmentsLoading && <p className="admin-muted" role="status">Procurando empresas...</p>}
               {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
