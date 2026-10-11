@@ -44,8 +44,8 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const subtitles: Record<string, string> = { google: company.name, pix: "Chave Pix: " + (signs.pix?.pix_key || ""), instagram: "Nosso perfil é " + (signs.instagram?.username || ""), wifi: "Rede: " + (signs.wifi?.network || "") + " · Senha: " + (signs.wifi?.password || ""), whatsapp: "Nosso número: " + (signs.whatsapp?.phone || "") }
   const openReview = () => { if (kind === "google" || kind === "instagram" || kind === "whatsapp") window.open(kind === "google" ? company.review_url : payload, "_blank", "noopener,noreferrer"); if (kind === "pix" && payload) void navigator.clipboard?.writeText(payload) }
   if (!["google", "pix", "instagram", "wifi", "whatsapp"].includes(kind) || (kind !== "google" && (!cfg?.enabled || !payload))) return <main className="review-page"><section className="review-card"><h1>Placa indisponível</h1><p className="subtitle">Ative e configure esta plaquinha no painel administrativo.</p></section></main>
-  return <main className="review-page virtual-sign-page" onClick={openReview}>
-    <section className="review-card" aria-label={"Placa " + kind + " de " + company.name}>
+  return <main className="review-page virtual-sign-page sign-carousel" onTouchStart={e => setTouchStartX(e.touches[0].clientX)} onTouchEnd={e => { if (touchStartX !== null) { const delta = e.changedTouches[0].clientX - touchStartX; if (Math.abs(delta) > 45) changeSlide(delta < 0 ? 1 : -1) } setTouchStartX(null) }}>
+    <section className="review-card" aria-label={"Placa " + kind + " de " + company.name} onClick={openReview}>
       {kind === "google" ? <GoogleMark /> : <div className={"google-mark sign-symbol sign-" + kind} aria-label={"Ícone " + kind} role="img"><img className="sign-icon-image" src={`/sign-icons/${kind}.png`} alt="" /></div>}
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>{titles[kind] || titles.google}{kind === "google" ? <><br/>empresa!</> : null}</h1>
@@ -64,6 +64,7 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
         </div>
       </div>
       <div className="footer-line"/><p className="powered">Powered by <strong>StarTouch</strong></p>
+      {availableKinds.length > 1 ? <div className="sign-carousel-controls"><button type="button" aria-label="Plaquinha anterior" onClick={e => { e.stopPropagation(); changeSlide(-1) }}>‹</button><div className="sign-carousel-dots">{availableKinds.map(item => <button type="button" key={item} aria-label={"Ver placa " + item} className={item === kind ? "active" : ""} onClick={e => { e.stopPropagation(); setActiveKind(item) }} />)}</div><button type="button" aria-label="Próxima plaquinha" onClick={e => { e.stopPropagation(); changeSlide(1) }}>›</button></div> : null}
     </section>
   </main>
 }
