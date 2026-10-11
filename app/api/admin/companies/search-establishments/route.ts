@@ -144,7 +144,7 @@ export async function GET(request: NextRequest) {
         seen.add(key)
         return true
       })
-      .filter((item: any) => !whatsappOnly || Boolean(item.whatsapp_url))
+      .filter((item: any) => !whatsappOnly || Boolean(item.phone))
       .sort((a: any, b: any) => a.name.localeCompare(b.name, "pt-BR"))
 
     return NextResponse.json({
@@ -152,7 +152,7 @@ export async function GET(request: NextRequest) {
       sources: ["OpenStreetMap / Overpass"],
       searchesPerformed: selectors.length,
       whatsappOnly,
-      notice: "Busca gratuita usando dados do OpenStreetMap. A cobertura depende dos estabelecimentos cadastrados no mapa. O filtro considera números públicos que podem ser abertos no WhatsApp; não confirma se a conta está ativa.",
+      notice: "Busca gratuita usando dados do OpenStreetMap. A cobertura depende dos estabelecimentos cadastrados no mapa. O filtro considera empresas com telefone público. Quando o número for compatível, também é oferecido o atalho para WhatsApp; não confirma se a conta está ativa.",
     })
   } catch {
     return NextResponse.json({ error: "Não foi possível consultar os estabelecimentos agora. Tente novamente." }, { status: 502 })
