@@ -387,6 +387,7 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
   border-radius:22px;
   text-shadow:0 2px 4px #000;
 }
+.sign-symbol svg { display:block; width:48px; height:48px; overflow:visible; }
 .sign-pix { color:#77c5f2 !important; }
 .sign-instagram { color:#e4b8ce !important; }
 .sign-wifi { color:#83b8f0 !important; }
