@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, MapPin, Plus, RefreshCw, Save, Search, ShieldCheck, Trash2 } from "lucide-react"
 
 type Company = { id: string; name: string; slug: string; review_url: string; created_at?: string; updated_at?: string }
-type Establishment = { id: string; name: string; address: string; maps_url: string; osm_url?: string; category: string }
+type Establishment = { id: string; name: string; address: string; maps_url: string; category: string; phone?: string; whatsapp_url?: string }
 
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
@@ -16,7 +16,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
-  const [establishmentQuery, setEstablishmentQuery] = useState("")
+  const [establishmentCity, setEstablishmentCity] = useState("Macaúbas, Bahia")
+  const [establishmentCategory, setEstablishmentCategory] = useState("restaurante")
   const [establishments, setEstablishments] = useState<Establishment[]>([])
   const [establishmentsLoading, setEstablishmentsLoading] = useState(false)
   const [establishmentsMessage, setEstablishmentsMessage] = useState("")
@@ -147,69 +148,56 @@ export default function AdminPage() {
             </section>
 
                         <section className="admin-panel">
-              <h2><MapPin size={20} /> Gerar estabelecimentos em Macaúbas, Bahia</h2>
-              <p>Gere uma lista de estabelecimentos em Macaúbas em tempo real, abra o resultado no Google Maps e copie o link para usar no cadastro.</p>
-              <form
-                onSubmit={async event => {
-                  event.preventDefault()
-                  const term = establishmentQuery.trim()
-                  if (term.length < 2) {
-                    setEstablishmentsMessage("Digite o nome ou o tipo de estabelecimento que deseja procurar.")
-                    return
-                  }
-                  setEstablishmentsLoading(true)
-                  setEstablishments([])
-                  setEstablishmentsMessage("")
-                  try {
-                    const response = await fetch("/api/admin/companies/search-establishments?q=" + encodeURIComponent(term), { cache: "no-store" })
-                    const data = await response.json()
-                    if (!response.ok) throw new Error(data.error || "Não foi possível procurar estabelecimentos.")
-                    setEstablishments(Array.isArray(data.results) ? data.results : [])
-                    if (!data.results?.length) setEstablishmentsMessage("Nenhum resultado encontrado. Tente outro nome ou tipo, como farmácia, mercado, salão ou restaurante.")
-                  } catch (e) {
-                    setEstablishmentsMessage(e instanceof Error ? e.message : "Não foi possível procurar estabelecimentos.")
-                  } finally {
-                    setEstablishmentsLoading(false)
-                  }
-                }}
-              >
-                <label htmlFor="establishment-search">Nome ou tipo de estabelecimento</label>
-                <div className="link-row">
-                  <input
-                    id="establishment-search"
-                    value={establishmentQuery}
-                    onChange={e => setEstablishmentQuery(e.target.value)}
-                    placeholder="Ex.: farmácia, mercado, restaurante..."
-                    minLength={2}
-                    required
-                  />
-                  <button className="admin-button primary icon-button" type="submit" title="Pesquisar" disabled={establishmentsLoading}>
-                    <Search size={16} />
-                  </button>
-                </div>
-                <p className="admin-muted">Digite um nome ou categoria. A consulta é feita online e fica limitada a Macaúbas, BA.</p>
+              <h2><MapPin size={20} /> Buscar empresas por cidade e categoria</h2>
+              <p>Informe a cidade e o tipo de empresa. Os resultados mostram os contatos públicos encontrados e um atalho para conversar pelo WhatsApp quando houver número disponível.</p>
+              <form onSubmit={async event => {
+                event.preventDefault()
+                const city = establishmentCity.trim()
+                const category = establishmentCategory.trim()
+                if (city.length < 2 || category.length < 2) {
+                  setEstablishmentsMessage("Informe a cidade e a categoria da empresa.")
+                  return
+                }
+                setEstablishmentsLoading(true)
+                setEstablishments([])
+                setEstablishmentsMessage("")
+                try {
+                  const params = new URLSearchParams({ city, category })
+                  const response = await fetch("/api/admin/companies/search-establishments?" + params.toString(), { cache: "no-store" })
+                  const data = await response.json()
+                  if (!response.ok) throw new Error(data.error || "Não foi possível procurar empresas.")
+                  setEstablishments(Array.isArray(data.results) ? data.results : [])
+                  if (!data.results?.length) setEstablishmentsMessage("Nenhuma empresa encontrada com esses dados. Tente outra categoria ou cidade.")
+                  else if (data.notice) setEstablishmentsMessage(data.notice)
+                } catch (e) {
+                  setEstablishmentsMessage(e instanceof Error ? e.message : "Não foi possível procurar empresas.")
+                } finally {
+                  setEstablishmentsLoading(false)
+                }
+              }}>
+                <label htmlFor="establishment-city">Cidade, estado ou país</label>
+                <input id="establishment-city" value={establishmentCity} onChange={e => setEstablishmentCity(e.target.value)} placeholder="Ex.: Macaúbas, Bahia" minLength={2} required />
+                <label htmlFor="establishment-category">Categoria de empresa</label>
+                <input id="establishment-category" value={establishmentCategory} onChange={e => setEstablishmentCategory(e.target.value)} placeholder="Ex.: restaurante, barbearia, oficina..." minLength={2} required />
+                <button className="admin-button primary" type="submit" disabled={establishmentsLoading}>
+                  <Search size={16} /> {establishmentsLoading ? "Buscando empresas..." : "Gerar lista de empresas"}
+                </button>
+                <p className="admin-muted">Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica. O WhatsApp só aparece quando existe um número público nos dados consultados.</p>
               </form>
-              {establishmentsLoading && <p className="admin-muted" role="status">Procurando estabelecimentos...</p>}
+              {establishmentsLoading && <p className="admin-muted" role="status">Procurando empresas...</p>}
               {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
-              {establishments.length > 0 && (
-                <div className="company-list">
-                  {establishments.map(place => (
-                    <article className="company-item" key={place.id}>
-                      <h3>{place.name}</h3>
-                      <p className="admin-muted">{place.address}</p>
-                      <p className="admin-muted">Categoria: {place.category}</p>
-                      <div className="link-row">
-                        <a className="admin-button secondary" href={place.maps_url} target="_blank" rel="noreferrer">
-                          <ExternalLink size={16} /> Abrir no Google Maps
-                        </a>
-                        <button className="admin-button primary" type="button" onClick={() => void copy(place.maps_url)}>
-                          <Copy size={16} /> Copiar link
-                        </button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              )}
+              {establishments.length > 0 && <div className="company-list">
+                {establishments.map(place => <article className="company-item" key={place.id}>
+                  <h3>{place.name}</h3>
+                  <p className="admin-muted">{place.address}</p>
+                  <p className="admin-muted">Categoria: {place.category}</p>
+                  {place.phone && <p className="admin-muted">Telefone público: {place.phone}</p>}
+                  <div className="link-row">
+                    {place.whatsapp_url ? <a className="admin-button primary" href={place.whatsapp_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Chamar no WhatsApp</a> : <span className="admin-muted">WhatsApp não informado publicamente</span>}
+                    <a className="admin-button secondary" href={place.maps_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Ver no Google Maps</a>
+                  </div>
+                </article>)}
+              </div>}
             </section>
           </>
         )}
