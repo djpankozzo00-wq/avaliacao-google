@@ -46,16 +46,27 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   if (!company && !notFound) return <main className="review-page"><section className="review-card"><p className="subtitle">Carregando avaliação...</p></section></main>
   if (!company) return <main className="review-page"><section className="review-card"><h1>Link não encontrado</h1><p className="subtitle">Confira o endereço com a empresa.</p></section></main>
   const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=420x420&margin=14&data=${encodeURIComponent(company.review_url)}`
-  return <main className="review-page" onClick={() => window.open(company.review_url, "_blank", "noopener,noreferrer")}>
+  const openReview = () => window.open(company.review_url, "_blank", "noopener,noreferrer")
+  return <main className="review-page virtual-sign-page" onClick={openReview}>
     <section className="review-card" aria-label={`Placa de avaliação de ${company.name}`}>
       <GoogleMark />
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>Avalie nossa<br/>empresa!</h1>
       <p className="subtitle">{company.name}</p>
       <div className="qr-shell"><img src={qrCode} alt={`QR Code para avaliar ${company.name} no Google`} /></div>
-      <p className="qr-label">QR CODE</p><div className="divider"/>
-      
-      <div className="footer-line"/><p className="powered">Powered by <strong>{company.name}</strong></p>
+      <p className="qr-label">QR CODE</p>
+      <div className="actions">
+        <div className="action-item touch-item">
+          <div className="scan-icon"><HandPhone /></div>
+          <span>Toque</span>
+        </div>
+        <span className="or">ou</span>
+        <div className="action-item scan-item">
+          <div className="scan-icon"><HandPhone scan /></div>
+          <span>Escaneie</span>
+        </div>
+      </div>
+      <div className="footer-line"/><p className="powered">Powered by <strong>StarTouch</strong></p>
     </section>
   </main>
 }
