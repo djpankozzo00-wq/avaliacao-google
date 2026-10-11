@@ -21,7 +21,7 @@ async function request(path: string, init: RequestInit = {}) {
 const columns = "id,name,slug,review_url,sign_configs,created_at,updated_at"
 function defaultSignConfigs() {
   return {
-    pix: { enabled: false, pix_key: "", recipient: "" },
+    pix: { enabled: false, pix_key: "", recipient: "", city: "" },
     instagram: { enabled: false, username: "", url: "" },
     wifi: { enabled: false, network: "", password: "", security: "WPA" },
     whatsapp: { enabled: false, phone: "", message: "" },
