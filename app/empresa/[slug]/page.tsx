@@ -10,27 +10,6 @@ function GoogleMark() {
 }
 
 
-function HandPhone({ scan = false }: { scan?: boolean }) {
-  if (scan) return <svg className="hand-phone" viewBox="0 0 100 150" aria-hidden="true">
-    <g fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="18" y="4" width="64" height="142" rx="16" />
-      <path d="M37 9h26q4 0 4 5v3q0 6-6 6H39q-6 0-6-6v-3q0-5 4-5Z" />
-      <path d="M40 139h20" />
-      <path d="M18 38H9Q3 38 3 47v20 M82 38h9q6 0 6 9v20 M18 107H9q-6 0-6-9v-8 M82 107h9q6 0 6-9v-8" />
-      <path d="M29 42h18v18H29z M53 42h18v18H53z M29 68h18v18H29z" />
-      <path d="M51 67h4v4h-4z M58 66h4v8h-4z M65 68h5v4h-5z M51 76h7v4h-7z M61 78h4v8h-4z M51 84h4v5h-4z M68 79h4v10h-4z M54 91h4v5h-4z M62 92h9v4h-9z" />
-    </g>
-    <path d="M8 75H92" stroke="#e74759" strokeWidth="3.5" strokeLinecap="round"/>
-  </svg>
-  return <svg className="hand-phone" viewBox="0 0 100 150" aria-hidden="true">
-    <g fill="none" stroke="currentColor" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 64A34 34 0 0 1 83 64" stroke="#4b4b4b" strokeWidth="7"/>
-      <path d="M29 64a22 22 0 0 1 42 0" stroke="#4b4b4b" strokeWidth="7"/>
-      <path d="M43 118 25 92q-5-8 2-12 7-4 12 4l5 8V58q0-8 7-8t7 8v22q7-8 13 0 7-3 10 5 8-1 8 8v24q0 10-9 16v10H44v-15Z" stroke="#080808" strokeWidth="7"/>
-    </g>
-  </svg>
-}
-
 export default function CompanyReviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const [company, setCompany] = useState<Company | null>(null)
   const [notFound, setNotFound] = useState(false)
@@ -56,12 +35,12 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <p className="qr-label">QR CODE</p>
       <div className="actions">
         <div className="action-item touch-item">
-          <div className="scan-icon"><HandPhone /></div>
+          <div className="scan-icon image-icon"><img src="/touch-icon.png" alt="Ícone de toque" /></div>
           <span>Toque</span>
         </div>
         <span className="or">ou</span>
         <div className="action-item scan-item">
-          <div className="scan-icon"><HandPhone scan /></div>
+          <div className="scan-icon image-icon"><img src="/scan-icon.png" alt="Ícone de escaneamento de QR Code" /></div>
           <span>Escaneie</span>
         </div>
       </div>
