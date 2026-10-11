@@ -18,6 +18,7 @@ export default function AdminPage() {
   const [error, setError] = useState("")
   const [establishmentCity, setEstablishmentCity] = useState("Macaúbas, Bahia")
   const [establishmentCategory, setEstablishmentCategory] = useState("restaurante")
+  const [whatsappOnly, setWhatsappOnly] = useState(false)
   const [establishments, setEstablishments] = useState<Establishment[]>([])
   const [establishmentsLoading, setEstablishmentsLoading] = useState(false)
   const [establishmentsMessage, setEstablishmentsMessage] = useState("")
@@ -162,7 +163,7 @@ export default function AdminPage() {
                 setEstablishments([])
                 setEstablishmentsMessage("")
                 try {
-                  const params = new URLSearchParams({ city, category })
+                  const params = new URLSearchParams({ city, category, whatsappOnly: String(whatsappOnly) })
                   const response = await fetch("/api/admin/companies/search-establishments?" + params.toString(), { cache: "no-store" })
                   const data = await response.json()
                   if (!response.ok) throw new Error(data.error || "Não foi possível procurar empresas.")
@@ -179,10 +180,14 @@ export default function AdminPage() {
                 <input id="establishment-city" value={establishmentCity} onChange={e => setEstablishmentCity(e.target.value)} placeholder="Ex.: Macaúbas, Bahia" minLength={2} required />
                 <label htmlFor="establishment-category">Categoria de empresa</label>
                 <input id="establishment-category" value={establishmentCategory} onChange={e => setEstablishmentCategory(e.target.value)} placeholder="Ex.: restaurante, barbearia, oficina..." minLength={2} required />
+                <label className="admin-muted" style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 12 }}>
+                  <input type="checkbox" checked={whatsappOnly} onChange={e => setWhatsappOnly(e.target.checked)} />
+                  Mostrar somente empresas com telefone público para contato pelo WhatsApp
+                </label>
                 <button className="admin-button primary" type="submit" disabled={establishmentsLoading}>
                   <Search size={16} /> {establishmentsLoading ? "Buscando empresas..." : "Gerar lista de empresas"}
                 </button>
-                <p className="admin-muted">Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica. O WhatsApp só aparece quando existe um número público nos dados consultados.</p>
+                <p className="admin-muted">Fontes: Google Maps / Places (quando a chave estiver configurada) e OpenStreetMap. O filtro usa telefones públicos e não confirma se o número tem WhatsApp ativo. Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica.</p>
               </form>
               {establishmentsLoading && <p className="admin-muted" role="status">Procurando empresas...</p>}
               {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
@@ -193,7 +198,7 @@ export default function AdminPage() {
                   <p className="admin-muted">Categoria: {place.category}</p>
                   {place.phone && <p className="admin-muted">Telefone público: {place.phone}</p>}
                   <div className="link-row">
-                    {place.whatsapp_url ? <a className="admin-button primary" href={place.whatsapp_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Chamar no WhatsApp</a> : <span className="admin-muted">WhatsApp não informado publicamente</span>}
+                    {place.whatsapp_url ? <a className="admin-button primary" href={place.whatsapp_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Abrir WhatsApp (telefone público)</a> : <span className="admin-muted">Telefone/WhatsApp não informado publicamente</span>}
                     <a className="admin-button secondary" href={place.maps_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Ver no Google Maps</a>
                   </div>
                 </article>)}
