@@ -182,12 +182,12 @@ export default function AdminPage() {
                 <input id="establishment-category" value={establishmentCategory} onChange={e => setEstablishmentCategory(e.target.value)} placeholder="Ex.: restaurante, barbearia, oficina..." minLength={2} required />
                 <label className="admin-muted" style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 12, marginBottom: 12 }}>
                   <input type="checkbox" checked={whatsappOnly} onChange={e => setWhatsappOnly(e.target.checked)} />
-                  Mostrar somente empresas com telefone público para contato pelo WhatsApp
+                  Mostrar somente empresas com telefone ou WhatsApp público
                 </label>
                 <button className="admin-button primary" type="submit" disabled={establishmentsLoading}>
                   <Search size={16} /> {establishmentsLoading ? "Buscando empresas..." : "Gerar lista de empresas"}
                 </button>
-                <p className="admin-muted">Fonte: OpenStreetMap / Overpass (gratuito, sujeito aos limites dos servidores públicos). O filtro usa telefones públicos e não confirma se o número tem WhatsApp ativo. Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica.</p>
+                <p className="admin-muted">Fonte: OpenStreetMap / Overpass (gratuito, sujeito aos limites dos servidores públicos). O filtro inclui empresas com telefone público; quando disponível, você pode abrir o WhatsApp ou ligar para o número. Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica.</p>
               </form>
               {establishmentsLoading && <p className="admin-muted" role="status">Procurando empresas...</p>}
               {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
@@ -198,7 +198,7 @@ export default function AdminPage() {
                   <p className="admin-muted">Categoria: {place.category}</p>
                   {place.phone && <p className="admin-muted">Telefone público: {place.phone}</p>}
                   <div className="link-row">
-                    {place.whatsapp_url ? <a className="admin-button primary" href={place.whatsapp_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Abrir WhatsApp (telefone público)</a> : <span className="admin-muted">Telefone/WhatsApp não informado publicamente</span>}
+                    {place.whatsapp_url ? <a className="admin-button primary" href={place.whatsapp_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Abrir WhatsApp</a> : place.phone ? <a className="admin-button primary" href={"tel:" + place.phone.replace(/[^0-9+]/g, "")}><ExternalLink size={16} /> Ligar para telefone</a> : <span className="admin-muted">Telefone/WhatsApp não informado publicamente</span>}{place.phone && place.whatsapp_url && <a className="admin-button secondary" href={"tel:" + place.phone.replace(/[^0-9+]/g, "")}><ExternalLink size={16} /> Ligar</a>}
                     <a className="admin-button secondary" href={place.maps_url} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Ver no Google Maps</a>
                   </div>
                 </article>)}
