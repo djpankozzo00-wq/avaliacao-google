@@ -11,8 +11,18 @@ function normalize(value: string) {
 
 function categoryTags(category: string) {
   const value = normalize(category)
-  if (["todas", "todos", "todas as categorias", "qualquer", "tudo"].includes(value)) {
-    return ['["shop"]', '["amenity"]', '["office"]', '["craft"]', '["tourism"]', '["leisure"]', '["healthcare"]']
+  if (["todas", "todos", "todas as categorias", "todas as empresas comerciais", "todas empresas comerciais", "empresas comerciais", "comercial", "comerciais", "qualquer", "tudo"].includes(value)) {
+    return [
+      '["shop"]',
+      '["office"]',
+      '["craft"]',
+      '["commercial"]',
+      '["industrial"]',
+      '["amenity"~"restaurant|fast_food|food_court|cafe|bar|pub|pharmacy|bank|bureau_de_change|fuel|car_wash|car_rental|car_repair|marketplace|post_office|clinic|doctors|dentist|veterinary|theatre|cinema|events_venue"]',
+      '["tourism"~"hotel|motel|guest_house|hostel|museum|attraction|gallery"]',
+      '["leisure"~"fitness_centre|sports_centre|water_park"]',
+      '["healthcare"~"clinic|dentist|doctor|physiotherapist|laboratory"]'
+    ]
   }
   const categories: Record<string, string[]> = {
     restaurante: ['["amenity"~"restaurant|fast_food|food_court"]', '["cuisine"]'],
