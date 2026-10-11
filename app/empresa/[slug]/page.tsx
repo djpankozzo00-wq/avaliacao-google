@@ -23,8 +23,8 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   }, [params])
   if (!company && !notFound) return <main className="review-page"><section className="review-card"><p className="subtitle">Carregando avaliação...</p></section></main>
   if (!company) return <main className="review-page"><section className="review-card"><h1>Link não encontrado</h1><p className="subtitle">Confira o endereço com a empresa.</p></section></main>
-  const params = new URLSearchParams(window.location.search)
-  const kind = params.get("tipo") || "google"
+  const searchParams = new URLSearchParams(window.location.search)
+  const kind = searchParams.get("tipo") || "google"
   const signs = company.sign_configs || {}
   const cfg = signs[kind]
   const phone = String(signs.whatsapp?.phone || "").replace(/[^0-9]/g, "")
