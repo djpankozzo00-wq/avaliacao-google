@@ -11,6 +11,9 @@ function normalize(value: string) {
 
 function categoryTags(category: string) {
   const value = normalize(category)
+  if (["todas", "todos", "todas as categorias", "qualquer", "tudo"].includes(value)) {
+    return ['["shop"]', '["amenity"]', '["office"]', '["craft"]', '["tourism"]', '["leisure"]', '["healthcare"]']
+  }
   const categories: Record<string, string[]> = {
     restaurante: ['["amenity"~"restaurant|fast_food|food_court"]', '["cuisine"]'],
     restaurantes: ['["amenity"~"restaurant|fast_food|food_court"]', '["cuisine"]'],
