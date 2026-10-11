@@ -1,4 +1,4 @@
-type CompanyInput = { name?: string; slug?: string; review_url?: string }
+type CompanyInput = { name?: string; slug?: string; review_url?: string; sign_configs?: Record<string, unknown> }
 
 function config() {
   const url = process.env.SUPABASE_URL
@@ -25,11 +25,11 @@ async function request(path: string, init: RequestInit = {}) {
 }
 
 export async function listCompanies() {
-  return request("companies?select=id,name,slug,review_url,created_at,updated_at&order=created_at.desc")
+  return request("companies?select=id,name,slug,review_url,sign_configs,created_at,updated_at&order=created_at.desc")
 }
 
 export async function getCompany(slug: string) {
-  const rows = await request(`companies?select=id,name,slug,review_url&slug=eq.${encodeURIComponent(slug)}&limit=1`)
+  const rows = await request(`companies?select=id,name,slug,review_url,sign_configs&slug=eq.${encodeURIComponent(slug)}&limit=1`)
   return Array.isArray(rows) ? rows[0] ?? null : null
 }
 
@@ -54,7 +54,7 @@ export async function updateCompany(id: string, input: CompanyInput) {
   const rows = await request(`companies?id=eq.${encodeURIComponent(id)}&select=id,name,slug,review_url,created_at,updated_at`, {
     method: "PATCH",
     headers: { Prefer: "return=representation" },
-    body: JSON.stringify({ review_url: reviewUrl, updated_at: new Date().toISOString() }),
+    body: JSON.stringify({ review_url: reviewUrl, ...(input.sign_configs ? { sign_configs: input.sign_configs } : {}), updated_at: new Date().toISOString() }),
   })
   if (!rows?.length) throw new Error("Empresa não encontrada.")
   return rows[0]
