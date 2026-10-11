@@ -388,6 +388,7 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
   text-shadow:0 2px 4px #000;
 }
 .sign-symbol svg { display:block; width:48px; height:48px; overflow:visible; }
+.sign-symbol .sign-icon-image { display: block; width: 100%; height: 100%; object-fit: contain; }
 .sign-symbol { background:linear-gradient(145deg, rgba(255,255,255,.10), rgba(0,0,0,.22)) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 7px 16px rgba(0,0,0,.28); }
 .sign-symbol svg { filter: drop-shadow(0 2px 2px rgba(0,0,0,.28)); }
 .sign-pix { color:#32b5d5 !important; border-color:rgba(50,181,213,.72) !important; }
