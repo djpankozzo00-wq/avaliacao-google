@@ -253,3 +253,26 @@ h1 { margin: 21px 0 8px; color: #fff; font-size: clamp(36px, 9vw, 49px); line-he
 .virtual-sign-page .footer-line { background: linear-gradient(90deg, transparent, #d4b574 8%, #d4b574 92%, transparent); box-shadow: 0 1px 2px #000; }
 .virtual-sign-page .powered { font-weight: 400; }
 .virtual-sign-page .powered strong { color: #e5c98d; font-weight: 800; }
+
+
+/* Centraliza a placa na tela do celular */
+html, body { min-height: 100%; }
+.virtual-sign-page {
+  box-sizing: border-box;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+}
+.virtual-sign-page .review-card {
+  box-sizing: border-box;
+  margin: auto;
+  flex: 0 0 auto;
+  width: min(100%, 430px);
+}
+@media (max-height: 760px) {
+  .virtual-sign-page { align-items: flex-start; }
+  .virtual-sign-page .review-card { min-height: 0; }
+}
