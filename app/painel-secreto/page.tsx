@@ -150,7 +150,7 @@ export default function AdminPage() {
 
                         <section className="admin-panel">
               <h2><MapPin size={20} /> Buscar empresas por cidade e categoria</h2>
-              <p>Informe a cidade e o tipo de empresa. Os resultados mostram os contatos públicos encontrados e um atalho para conversar pelo WhatsApp quando houver número disponível.</p>
+              <p>Informe a cidade e o tipo de empresa. A busca usa OpenStreetMap e Overpass, sem exigir chave paga. Os resultados mostram contatos públicos e atalho para WhatsApp quando houver número disponível.</p>
               <form onSubmit={async event => {
                 event.preventDefault()
                 const city = establishmentCity.trim()
@@ -187,7 +187,7 @@ export default function AdminPage() {
                 <button className="admin-button primary" type="submit" disabled={establishmentsLoading}>
                   <Search size={16} /> {establishmentsLoading ? "Buscando empresas..." : "Gerar lista de empresas"}
                 </button>
-                <p className="admin-muted">Fontes: Google Maps / Places (quando a chave estiver configurada) e OpenStreetMap. O filtro usa telefones públicos e não confirma se o número tem WhatsApp ativo. Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica.</p>
+                <p className="admin-muted">Fonte: OpenStreetMap / Overpass (gratuito, sujeito aos limites dos servidores públicos). O filtro usa telefones públicos e não confirma se o número tem WhatsApp ativo. Exemplos: restaurante, barbearia, salão de beleza, mercado, oficina mecânica.</p>
               </form>
               {establishmentsLoading && <p className="admin-muted" role="status">Procurando empresas...</p>}
               {establishmentsMessage && <p className="admin-muted" role="status">{establishmentsMessage}</p>}
