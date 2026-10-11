@@ -370,3 +370,48 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
     font-size: 16px !important;
   }
 }
+
+
+/* Layout das novas plaquinhas e dos editores administrativos */
+.sign-symbol {
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:84px !important;
+  height:84px !important;
+  margin:0 auto 20px !important;
+  color:#e6c778 !important;
+  font-size:42px !important;
+  font-weight:800 !important;
+  border:2px solid #b99a53;
+  border-radius:22px;
+  text-shadow:0 2px 4px #000;
+}
+.sign-pix { color:#77c5f2 !important; }
+.sign-instagram { color:#e4b8ce !important; }
+.sign-wifi { color:#83b8f0 !important; }
+.sign-whatsapp { color:#8ed5a3 !important; }
+.sign-config-editor {
+  display:grid;
+  gap:12px;
+  margin:18px 0;
+  padding:16px;
+  border:1px solid rgba(190,160,90,.45);
+  border-radius:14px;
+  background:rgba(190,160,90,.05);
+}
+.sign-config-editor h4 { margin:0; font-size:16px; }
+.sign-config-item {
+  display:grid;
+  gap:8px;
+  padding:12px 0;
+  border-top:1px solid rgba(190,160,90,.25);
+}
+.sign-config-item label { font-size:13px; font-weight:600; }
+.sign-config-item input:not([type="checkbox"]) {
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+.sign-enable { display:flex; align-items:center; gap:9px; }
+.sign-enable input { width:18px; height:18px; }
