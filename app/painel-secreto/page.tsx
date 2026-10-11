@@ -176,7 +176,7 @@ export default function AdminPage() {
               <p>Informe a cidade e o estado. Digite “todas” para buscar diferentes tipos de estabelecimentos ou escolha uma categoria específica. A busca usa OpenStreetMap e Overpass, sem exigir chave paga. Os resultados mostram contatos públicos e atalho para WhatsApp quando houver número disponível.</p>
               <form onSubmit={async event => {
                 event.preventDefault()
-                const stateName = { AC: "Acre", AL: "Alagoas", AP: "Amapá", AM: "Amazonas", BA: "Bahia", CE: "Ceará", DF: "Distrito Federal", ES: "Espírito Santo", GO: "Goiás", MA: "Maranhão", MT: "Mato Grosso", MS: "Mato Grosso do Sul", MG: "Minas Gerais", PA: "Pará", PB: "Paraíba", PR: "Paraná", PE: "Pernambuco", PI: "Piauí", RJ: "Rio de Janeiro", RN: "Rio Grande do Norte", RS: "Rio Grande do Sul", RO: "Rondônia", RR: "Roraima", SC: "Santa Catarina", SP: "São Paulo", SE: "Sergipe", TO: "Tocantins" }[establishmentState]
+                const stateName = ({ AC: "Acre", AL: "Alagoas", AP: "Amapá", AM: "Amazonas", BA: "Bahia", CE: "Ceará", DF: "Distrito Federal", ES: "Espírito Santo", GO: "Goiás", MA: "Maranhão", MT: "Mato Grosso", MS: "Mato Grosso do Sul", MG: "Minas Gerais", PA: "Pará", PB: "Paraíba", PR: "Paraná", PE: "Pernambuco", PI: "Piauí", RJ: "Rio de Janeiro", RN: "Rio Grande do Norte", RS: "Rio Grande do Sul", RO: "Rondônia", RR: "Roraima", SC: "Santa Catarina", SP: "São Paulo", SE: "Sergipe", TO: "Tocantins" } as Record<string, string>)[establishmentState]
                 const city = establishmentCity.trim() + (stateName ? ", " + stateName : "")
                 const category = establishmentCategory.trim()
                 if (city.length < 2 || category.length < 2) {
