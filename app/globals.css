@@ -562,3 +562,50 @@ body { overflow-x: hidden; }
   .virtual-sign-page .review-card { animation: none !important; transition: none !important; }
   .virtual-sign-page .qr-shell { transition: none !important; }
 }
+
+
+/* Tema cinza 3D da plaquinha: acabamento metálico, sem alterar a estrutura nem as interações */
+.virtual-sign-page { background: #101113 !important; }
+.virtual-sign-page .review-card {
+  border: 2px solid #aeb2b8 !important;
+  border-radius: 28px !important;
+  background-color: #686b70 !important;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.34), transparent 42%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 4px),
+    linear-gradient(145deg, #9a9da2 0%, #686b70 26%, #3e4146 62%, #777a7f 100%) !important;
+  box-shadow: inset 0 2px 3px rgba(255,255,255,.5), inset 0 0 0 3px rgba(20,22,25,.35), inset 0 -10px 22px rgba(0,0,0,.34), 0 3px 0 #222428, 0 18px 45px rgba(0,0,0,.68) !important;
+}
+.virtual-sign-page .review-card::before {
+  border-color: rgba(255,255,255,.24) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+}
+.virtual-sign-page h1,
+.virtual-sign-page .subtitle,
+.virtual-sign-page .qr-label,
+.virtual-sign-page .action-item span,
+.virtual-sign-page .or,
+.virtual-sign-page .powered,
+.virtual-sign-page .powered strong {
+  color: #f2f3f5 !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 2px 4px rgba(0,0,0,.42) !important;
+}
+.virtual-sign-page .qr-shell {
+  border: 1px solid #d5d7da !important;
+  background: linear-gradient(145deg, #f5f6f7, #c7cbd0) !important;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.9), 0 5px 12px rgba(0,0,0,.4) !important;
+}
+.virtual-sign-page .footer-line {
+  background: linear-gradient(90deg, transparent, #c7cbd0 8%, #e7e9eb 50%, #c7cbd0 92%, transparent) !important;
+}
+.virtual-sign-page .sign-carousel-controls > button {
+  border-color: rgba(238,240,242,.65) !important;
+  color: #f2f3f5 !important;
+  background: rgba(30,32,35,.4) !important;
+}
+.virtual-sign-page .sign-carousel-dots button { background: rgba(242,243,245,.4) !important; }
+.virtual-sign-page .sign-carousel-dots button.active { background: #f2f3f5 !important; }
+.virtual-sign-page .review-card:active { filter: brightness(1.08) !important; }
+@media (prefers-reduced-motion: reduce) {
+  .virtual-sign-page .review-card, .virtual-sign-page .qr-shell { animation: none !important; transition: none !important; }
+}
