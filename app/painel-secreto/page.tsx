@@ -123,9 +123,8 @@ export default function AdminPage() {
               <p>Cadastre o cliente e configure somente a plaquinha que ele deseja usar. O link do Google é opcional.</p>
               <label htmlFor="company-name">Nome da empresa</label>
               <input id="company-name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o nome do estabelecimento" minLength={2} required />
-              <label htmlFor="review-url">Link de avaliação do Google</label>
-              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" required />
-              <p className="admin-muted">Use o buscador abaixo para encontrar o estabelecimento em Macaúbas e copiar o link do Google Maps.</p>
+              <label htmlFor="review-url">Link de avaliação do Google (opcional)</label>
+              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="Preencha somente se quiser a plaquinha Google" />
               <button className="admin-button primary" disabled={loading}><Plus size={17} /> {loading ? "Salvando..." : "Cadastrar e gerar link exclusivo"}</button>
             </form>
 
@@ -139,8 +138,9 @@ export default function AdminPage() {
                   <label htmlFor={`review-${company.id}`}>Link de avaliação configurado</label>
                   <input id={`review-${company.id}`} type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} />
                   <div className="sign-config-editor">
-                    <h4>Configurar outras plaquinhas</h4>
-                    {(["pix", "instagram", "wifi", "whatsapp"] as const).map(kind => {
+                    <h4>Configurar uma plaquinha por vez</h4>
+                    <div className="sign-picker">{([{ id: "whatsapp", label: "WhatsApp" }, { id: "pix", label: "Pix" }, { id: "wifi", label: "Wi-Fi" }, { id: "instagram", label: "Instagram" }] as const).map(option => <button type="button" key={option.id} className={"admin-button " + ((selectedSigns[company.id] || "whatsapp") === option.id ? "primary" : "secondary")} onClick={() => setSelectedSigns(old => ({ ...old, [company.id]: option.id }))}>{option.label}</button>)}</div>
+                    {([selectedSigns[company.id] || "whatsapp"] as (keyof SignConfigs)[]).map(kind => {
                       const cfg = editSigns[company.id]?.[kind] || emptySigns[kind]
                       const patch = (field: string, value: string | boolean) => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), [kind]: { ...((old[company.id] || emptySigns)[kind]), [field]: value } } as SignConfigs }))
                       const titles = { pix: "Pagamento Pix", instagram: "Instagram", wifi: "Wi-Fi", whatsapp: "WhatsApp" }
