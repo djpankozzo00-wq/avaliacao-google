@@ -851,3 +851,9 @@ body { overflow-x: hidden; }
 .virtual-sign-page .qr-shell {
   background: linear-gradient(145deg, #515256 0%, #343539 35%, #222326 70%, #3b3c40 100%) !important;
 }
+
+
+/* Cor solicitada para o fundo do QR Code */
+.virtual-sign-page .qr-shell {
+  background: #EDE8D0 !important;
+}
