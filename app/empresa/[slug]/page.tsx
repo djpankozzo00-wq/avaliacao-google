@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 
 type Company = { name: string; slug: string; review_url: string; sign_configs?: any }
@@ -16,7 +16,8 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const [company, setCompany] = useState<Company | null>(null)
   const [notFound, setNotFound] = useState(false)
   const [activeKind, setActiveKind] = useState("google")
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const touchStartX = useRef<number | null>(null)
+  const didSwipe = useRef(false)
   const [pixCopyPaste, setPixCopyPaste] = useState("")
   const [pixError, setPixError] = useState("")
   const [wifiFocus, setWifiFocus] = useState(false)
@@ -95,9 +96,8 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const openReview = () => { if (kind === "wifi") { setWifiFocus(value => !value); return } if (kind === "google" || kind === "instagram" || kind === "whatsapp") window.open(kind === "google" ? company.review_url : payload, "_blank", "noopener,noreferrer"); if (kind === "pix" && payload) void navigator.clipboard?.writeText(payload) }
   if (!["google", "pix", "instagram", "wifi", "whatsapp"].includes(kind) || (kind !== "google" && (!cfg?.enabled || !payload))) return <main className="review-page"><section className="review-card"><h1>Placa indisponível</h1><p className="subtitle">Ative e configure esta plaquinha no painel administrativo.</p></section></main>
   const exactPlaqueImages: Record<SignKind, string> = { google: "/sign-icons/google-plaque-reference.png", pix: "/sign-icons/pix-plaque-reference.png", instagram: "/sign-icons/instagram-plaque-reference.png", wifi: "/sign-icons/wifi-plaque-reference.png", whatsapp: "/sign-icons/whatsapp-plaque-reference.png" }
-  return <main className="review-page exact-plaque-page sign-carousel" onClick={openReview} onTouchStart={e => setTouchStartX(e.touches[0].clientX)} onTouchEnd={e => { if (touchStartX !== null) { const delta = e.changedTouches[0].clientX - touchStartX; if (Math.abs(delta) > 45) { e.preventDefault(); changeSlide(delta < 0 ? 1 : -1) } } setTouchStartX(null) }} aria-label={"Plaquinha de " + kind + " de " + company.name}><img className="exact-plaque-image" src={exactPlaqueImages[kind]} alt={"Plaquinha de " + kind + " com QR Code"} /></main>
-  return <main className="review-page virtual-sign-page sign-carousel" onTouchStart={e => setTouchStartX(e.touches[0].clientX)} onTouchEnd={e => { if (touchStartX !== null) { const delta = e.changedTouches[0].clientX - touchStartX; if (Math.abs(delta) > 45) changeSlide(delta < 0 ? 1 : -1) } setTouchStartX(null) }}>
-    <section className={"review-card" + (kind === "wifi" && wifiFocus ? " wifi-focus" : "")} aria-label={"Placa " + kind + " de " + company.name} onClick={openReview} style={{ WebkitTextStroke: "0.25px #000", paintOrder: "stroke fill" }}>
+  return <main className="review-page virtual-sign-page sign-carousel" onTouchStart={e => { touchStartX.current = e.touches[0].clientX; didSwipe.current = false }} onTouchEnd={e => { if (touchStartX.current !== null) { const delta = e.changedTouches[0].clientX - touchStartX.current; if (Math.abs(delta) > 45) { didSwipe.current = true; changeSlide(delta < 0 ? 1 : -1) } } touchStartX.current = null }}>
+    <section className={"review-card" + (kind === "wifi" && wifiFocus ? " wifi-focus" : "")} aria-label={"Placa " + kind + " de " + company.name} onClick={() => { if (didSwipe.current) { didSwipe.current = false; return } openReview() }} style={{ WebkitTextStroke: "0.25px #000", paintOrder: "stroke fill" }}>
       <div className={"google-mark sign-symbol sign-" + kind} aria-label={"Ícone " + kind} role="img"><img className="sign-icon-image" src={`/sign-icons/${kind}.png`} alt="" /></div>
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>{titles[kind] || titles.google}{kind === "google" ? <><br/>empresa!</> : null}</h1>
