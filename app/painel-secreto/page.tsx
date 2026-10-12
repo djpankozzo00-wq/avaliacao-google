@@ -175,7 +175,7 @@ export default function AdminPage() {
                             <label>Brilho metálico: {design.shine}%<input type="range" min="0" max="100" value={design.shine} onChange={e => updateDesign("shine", Number(e.target.value))} /></label>
                             <label>Fosco: {design.matte}%<input type="range" min="0" max="100" value={design.matte} onChange={e => updateDesign("matte", Number(e.target.value))} /></label>
                             <label>Arredondamento da borda: {design.radius}px<input type="range" min="0" max="36" value={design.radius} onChange={e => updateDesign("radius", Number(e.target.value))} /></label>
-                            <button className="admin-button secondary" type="button" onClick={() => updateDesign("background", defaultDesign.background)}>Voltar cor de fundo original</button>
+                            <button className="admin-button secondary" type="button" onClick={() => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), design: { ...defaultDesign, ...(old[company.id]?.design || {}), background: defaultDesign.background, border: defaultDesign.border, text: defaultDesign.text, title: defaultDesign.title, stars: defaultDesign.stars, qrFrame: defaultDesign.qrFrame } } }))}>Restaurar todas as cores originais</button>
                             <button className="admin-button secondary" type="button" onClick={() => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), design: { ...defaultDesign } } }))}>Restaurar aparência original</button>
                           </div>
                         </>
