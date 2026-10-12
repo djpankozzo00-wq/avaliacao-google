@@ -113,7 +113,7 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
           <span>Escaneie</span>
         </div>
       </div>
-      <div className="footer-line"/><p className="powered"><a href="https://www.instagram.com/_xdhesy_?psln=YzdmNG9rYW9jdmg=" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()}>Powered by <strong>XDhe$y</strong></a></p>
+      <div className="footer-line"/><p className="powered"><a href="https://www.instagram.com/_xdhesy_?psln=YzdmNG9rYW9jdmg=" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ WebkitTextStroke: "0.35px #000", paintOrder: "stroke fill", textDecoration: "none" }}>Powered by <strong>XDhe$y</strong></a></p>
       {availableKinds.length > 1 ? <div className="sign-carousel-controls"><button type="button" aria-label="Plaquinha anterior" onClick={e => { e.stopPropagation(); changeSlide(-1) }}>‹</button><div className="sign-carousel-dots">{availableKinds.map(item => <button type="button" key={item} aria-label={"Ver placa " + item} className={item === kind ? "active" : ""} onClick={e => { e.stopPropagation(); setActiveKind(item) }} />)}</div><button type="button" aria-label="Próxima plaquinha" onClick={e => { e.stopPropagation(); changeSlide(1) }}>›</button></div> : null}
     </section>
   </main>
