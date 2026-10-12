@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [reviewUrl, setReviewUrl] = useState("")
   const [editUrls, setEditUrls] = useState<Record<string, string>>({})
   const [editSigns, setEditSigns] = useState<Record<string, SignConfigs>>({})
+  const [selectedSigns, setSelectedSigns] = useState<Record<string, keyof SignConfigs>>({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
@@ -64,7 +65,7 @@ export default function AdminPage() {
       const response = await fetch(`/api/admin/companies/${company.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ review_url: editUrls[company.id], sign_configs: editSigns[company.id] }) })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível salvar.")
-      setMessage(`Link de avaliação de ${company.name} atualizado.`)
+      setMessage(`Configurações das plaquinhas de ${company.name} salvas.`)
       await loadCompanies()
     } catch (e) { setError(e instanceof Error ? e.message : "Erro ao salvar.") }
     finally { setLoading(false) }
@@ -119,7 +120,7 @@ export default function AdminPage() {
           <>
             <form className="admin-panel" onSubmit={create}>
               <h2><Plus size={20} /> Cadastrar empresa</h2>
-              <p>Informe o nome e o link oficial de avaliação do Google. Um endereço exclusivo será gerado para essa empresa.</p>
+              <p>Cadastre o cliente e configure somente a plaquinha que ele deseja usar. O link do Google é opcional.</p>
               <label htmlFor="company-name">Nome da empresa</label>
               <input id="company-name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o nome do estabelecimento" minLength={2} required />
               <label htmlFor="review-url">Link de avaliação do Google</label>
@@ -153,7 +154,7 @@ export default function AdminPage() {
                       </div>
                     })}
                   </div>
-                  <button className="admin-button primary" type="button" onClick={() => void saveLink(company)} disabled={loading}><Save size={16} /> Salvar link de avaliação</button>
+                  <button className="admin-button primary" type="button" onClick={() => void saveLink(company)} disabled={loading}><Save size={16} /> Salvar configuração</button>
                   <button className="admin-button danger" type="button" onClick={() => void deleteCompany(company)} disabled={loading}><Trash2 size={16} /> Apagar empresa</button>
                 </article>)}
               </div>}
