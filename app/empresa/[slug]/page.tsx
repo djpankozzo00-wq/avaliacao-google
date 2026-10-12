@@ -36,7 +36,7 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   if (!["google", "pix", "instagram", "wifi", "whatsapp"].includes(kind) || (kind !== "google" && (!cfg?.enabled || !payload))) return <main className="review-page"><section className="review-card"><h1>Placa indisponível</h1><p className="subtitle">Ative e configure esta plaquinha no painel administrativo.</p></section></main>
   return <main className="review-page virtual-sign-page" onClick={openReview}>
     <section className="review-card" aria-label={"Placa " + kind + " de " + company.name}>
-      {kind === "google" ? <GoogleMark /> : <div className={"google-mark sign-symbol sign-" + kind} aria-label={"Ícone " + kind} role="img"><img className="sign-icon-image" src={`/sign-icons/${kind}.png`} alt="" /></div>}
+      <div className={"google-mark sign-symbol sign-" + kind} aria-label={"Ícone " + kind} role="img"><img className="sign-icon-image" src={`/sign-icons/${kind}.png`} alt="" /></div>
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>{titles[kind] || titles.google}{kind === "google" ? <><br/>empresa!</> : null}</h1>
       <p className="subtitle">{subtitles[kind] || company.name}</p>
