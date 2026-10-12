@@ -500,3 +500,8 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
   cursor: pointer;
 }
 .sign-carousel-dots button.active { width: 18px; border-radius: 8px; background: #e5c98d; }
+
+
+/* Seletor de plaquinhas no painel */
+.sign-picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
+.sign-picker .admin-button.primary { margin-top: 0; }
