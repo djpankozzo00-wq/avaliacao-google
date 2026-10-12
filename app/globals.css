@@ -853,7 +853,8 @@ body { overflow-x: hidden; }
 }
 
 
-/* Cor solicitada para o fundo do QR Code */
+
+/* Preservar o preto no fundo da área do QR Code */
 .virtual-sign-page .qr-shell {
-  background: #EDE8D0 !important;
+  background: #000000 !important;
 }
