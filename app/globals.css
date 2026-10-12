@@ -523,3 +523,24 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
     0 2px 0 #080808,
     0 18px 45px rgba(0,0,0,.65);
 }
+
+
+/* Cinza grafite escuro com brilho polido e reflexos metálicos */
+.virtual-sign-page .review-card {
+  background-color: #292a2c !important;
+  background-image:
+    linear-gradient(118deg, rgba(255,255,255,.23) 0%, rgba(255,255,255,.07) 12%, transparent 29%, transparent 62%, rgba(255,255,255,.10) 78%, transparent 100%),
+    radial-gradient(ellipse at 50% -8%, rgba(255,255,255,.22), transparent 44%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 4px),
+    linear-gradient(135deg, #45464a 0%, #303135 24%, #202124 52%, #38393c 76%, #252629 100%) !important;
+  border-color: #77777a !important;
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,.34),
+    inset 0 0 0 2px rgba(255,255,255,.055),
+    inset 0 -12px 24px rgba(0,0,0,.36),
+    0 2px 0 #090909,
+    0 18px 45px rgba(0,0,0,.72) !important;
+}
+.virtual-sign-page .review-card::before {
+  border-color: rgba(255,255,255,.18) !important;
+}
