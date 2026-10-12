@@ -9,6 +9,9 @@
 html, body { min-height: 100%; }
 body { margin: 0; background: #070707; color: #fff; font-family: Arial, Helvetica, sans-serif; }
 
+.exact-plaque-page { min-height: 100dvh; width: 100%; display: flex; align-items: center; justify-content: center; background: #000; cursor: pointer; padding: 0; }
+.exact-plaque-image { display: block; width: min(100vw, 480px); height: auto; max-height: 100dvh; object-fit: contain; }
+
 .review-page {
   min-height: 100svh;
   display: flex;
