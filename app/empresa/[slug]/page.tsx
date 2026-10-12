@@ -77,7 +77,9 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   }, [params])
   if (!company && !notFound) return <main className="review-page"><section className="review-card"><p className="subtitle">Carregando avaliação...</p></section></main>
   if (!company) return <main className="review-page"><section className="review-card"><h1>Link não encontrado</h1><p className="subtitle">Confira o endereço com a empresa.</p></section></main>
-  const signs = company.sign_configs || {}
+  const storedSigns = company.sign_configs || {}
+  // Paleta original restaurada na placa pública, independentemente de cores antigas salvas.
+  const signs = { ...storedSigns, design: { ...(storedSigns.design || {}), background: "#292a2c", border: "#d4b36a", text: "#f7f3e9", title: "#ffffff", stars: "#e5c98d", qrFrame: "#ffffff", shine: 70, matte: 15, radius: 18, titleFont: "Arial", bodyFont: "Arial" } }
   const availableKinds = ["google", "pix", "instagram", "wifi", "whatsapp"].filter(item => item === "google" ? (signs.google?.enabled === true && Boolean(company.review_url)) : (signs[item]?.enabled && (item === "pix" ? signs.pix?.pix_key : item === "instagram" ? (signs.instagram?.url || signs.instagram?.username) : item === "wifi" ? signs.wifi?.network : signs.whatsapp?.phone)))
   const kind = availableKinds.includes(activeKind) ? activeKind : (availableKinds[0] || "google")
   const changeSlide = (direction: number) => {
