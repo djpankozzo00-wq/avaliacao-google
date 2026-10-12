@@ -3,9 +3,9 @@
 import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
-type SignConfigs = { pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
+type SignConfigs = { google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
 type Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }
-const emptySigns: SignConfigs = { pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
+const emptySigns: SignConfigs = { google: { enabled: false }, pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
@@ -99,6 +99,15 @@ export default function AdminPage() {
   }
 
   const publicUrl = (slug: string, type = "google") => typeof window === "undefined" ? `/empresa/${slug}?tipo=${type}` : `${window.location.origin}/empresa/${slug}?tipo=${type}`
+  const defaultType = (company: Company) => {
+    const signs = editSigns[company.id] || { ...emptySigns, ...(company.sign_configs || {}) }
+    if (signs.whatsapp?.enabled && signs.whatsapp.phone.trim()) return "whatsapp"
+    if (signs.pix?.enabled && signs.pix.pix_key.trim()) return "pix"
+    if (signs.wifi?.enabled && signs.wifi.network.trim()) return "wifi"
+    if (signs.instagram?.enabled && (signs.instagram.url.trim() || signs.instagram.username.trim())) return "instagram"
+    if (signs.google?.enabled && company.review_url) return "google"
+    return "whatsapp"
+  }
 
   return (
     <main className="admin-page">
@@ -134,18 +143,18 @@ export default function AdminPage() {
                 {companies.map(company => <article className="company-item" key={company.id}>
                   <h3>{company.name}</h3>
                   <label>Link exclusivo desta empresa</label>
-                  <div className="link-row"><input readOnly value={publicUrl(company.slug, company.review_url ? "google" : "whatsapp")} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug, company.review_url ? "google" : "whatsapp"))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={publicUrl(company.slug, company.review_url ? "google" : "whatsapp")} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
-                  <label htmlFor={`review-${company.id}`}>Link de avaliação configurado</label>
-                  <input id={`review-${company.id}`} type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} />
+                  <div className="link-row"><input readOnly value={publicUrl(company.slug, defaultType(company))} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug, defaultType(company)))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={publicUrl(company.slug, defaultType(company))} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
+                  
                   <div className="sign-config-editor">
                     <h4>Configurar uma plaquinha por vez</h4>
-                    <div className="sign-picker">{([{ id: "whatsapp", label: "WhatsApp" }, { id: "pix", label: "Pix" }, { id: "wifi", label: "Wi-Fi" }, { id: "instagram", label: "Instagram" }] as const).map(option => <button type="button" key={option.id} className={"admin-button " + ((selectedSigns[company.id] || "whatsapp") === option.id ? "primary" : "secondary")} onClick={() => setSelectedSigns(old => ({ ...old, [company.id]: option.id }))}>{option.label}</button>)}</div>
+                    <div className="sign-picker">{([{ id: "google", label: "Avaliação Google" }, { id: "whatsapp", label: "WhatsApp" }, { id: "pix", label: "Pix" }, { id: "wifi", label: "Wi-Fi" }, { id: "instagram", label: "Instagram" }] as const).map(option => <button type="button" key={option.id} className={"admin-button " + ((selectedSigns[company.id] || "whatsapp") === option.id ? "primary" : "secondary")} onClick={() => setSelectedSigns(old => ({ ...old, [company.id]: option.id }))}>{option.label}</button>)}</div>
                     {([selectedSigns[company.id] || "whatsapp"] as (keyof SignConfigs)[]).map(kind => {
                       const cfg = editSigns[company.id]?.[kind] || emptySigns[kind]
                       const patch = (field: string, value: string | boolean) => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), [kind]: { ...((old[company.id] || emptySigns)[kind]), [field]: value } } as SignConfigs }))
-                      const titles = { pix: "Pagamento Pix", instagram: "Instagram", wifi: "Wi-Fi", whatsapp: "WhatsApp" }
+                      const titles = { google: "Avaliação Google", pix: "Pagamento Pix", instagram: "Instagram", wifi: "Wi-Fi", whatsapp: "WhatsApp" }
                       return <div className="sign-config-item" key={kind}>
                         <label className="sign-enable"><input type="checkbox" checked={cfg.enabled} onChange={e => patch("enabled", e.target.checked)} /> Ativar placa de {titles[kind]}</label>
+                        {kind === "google" && <><label>Link de avaliação do Google</label><input type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} placeholder="https://g.page/r/.../review" /></>}
                         {kind === "pix" && <><label>Chave Pix</label><input value={cfg.pix_key} onChange={e => patch("pix_key", e.target.value)} placeholder="Chave Pix" /><label>Nome do recebedor</label><input value={cfg.recipient} onChange={e => patch("recipient", e.target.value)} placeholder="Nome exibido na placa" /><label>Cidade do titular do Pix</label><input value={cfg.city || ""} onChange={e => patch("city", e.target.value.toUpperCase())} placeholder="Ex.: MACAÚBAS" maxLength={15} /></>}
                         {kind === "instagram" && <><label>Usuário do Instagram</label><input value={cfg.username} onChange={e => patch("username", e.target.value)} placeholder="@seuperfil" /><label>Link do perfil</label><input value={cfg.url} onChange={e => patch("url", e.target.value)} placeholder="https://instagram.com/seuperfil" /></>}
                         {kind === "wifi" && <><label>Nome da rede Wi-Fi</label><input value={cfg.network} onChange={e => patch("network", e.target.value)} placeholder="Nome da rede" /><label>Senha do Wi-Fi</label><input value={cfg.password} onChange={e => patch("password", e.target.value)} placeholder="Senha da rede" /><label>Tipo de segurança</label><select value={cfg.security || "WPA"} onChange={e => patch("security", e.target.value)}><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">Sem senha</option></select>{cfg.network.trim() && <div className="wifi-qr-preview"><p className="admin-muted">Prévia do QR Code Wi-Fi</p><img width="220" height="220" alt={"QR Code da rede Wi-Fi " + cfg.network} src={"https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=" + encodeURIComponent("WIFI:T:" + (cfg.security || "WPA") + ";S:" + cfg.network.replace(/([\\;,:"])/g, "\\$1") + ";" + ((cfg.security || "WPA") === "nopass" ? "" : "P:" + cfg.password.replace(/([\\;,:"])/g, "\\$1") + ";") + ";")} /></div>}</>}
