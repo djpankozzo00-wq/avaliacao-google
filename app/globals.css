@@ -588,3 +588,7 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
 .virtual-sign-page .review-card .actions,
 .virtual-sign-page .review-card .powered { color: var(--sign-text, #f7f3e9) !important; }
 .virtual-sign-page .review-card .qr-shell { border-color: var(--sign-qr-frame, #fff) !important; }
+
+/* Custom fonts for public sign */
+.virtual-sign-page .review-card h1 { font-family: var(--sign-title-font, Arial), sans-serif !important; }
+.virtual-sign-page .review-card .subtitle, .virtual-sign-page .review-card .qr-label, .virtual-sign-page .review-card .actions, .virtual-sign-page .review-card .powered { font-family: var(--sign-body-font, Arial), sans-serif !important; }
