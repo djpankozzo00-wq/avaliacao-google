@@ -503,3 +503,10 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
   cursor: pointer;
 }
 .sign-carousel-dots button.active { width: 18px; border-radius: 8px; background: #e5c98d; }
+
+
+/* Interação restaurada nas plaquinhas de imagem */
+.exact-plaque-image { transition: transform 180ms ease, filter 180ms ease; animation: exactPlaqueAppear .45s ease-out both; }
+.exact-plaque-page:active .exact-plaque-image { transform: scale(.985); filter: brightness(1.08); }
+@keyframes exactPlaqueAppear { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .exact-plaque-image { animation: none; transition: none; } }
