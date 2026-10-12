@@ -3,9 +3,9 @@
 import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
-type SignConfigs = { google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
+type SignDesign = { background: string; border: string; text: string; title: string; stars: string; qrFrame: string; shine: number; matte: number; radius: number; }\ntype SignConfigs = { design?: SignDesign; google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
 type Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }
-const emptySigns: SignConfigs = { google: { enabled: false }, pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
+const defaultDesign: SignDesign = { background: "#292a2c", border: "#d4b36a", text: "#f7f3e9", title: "#ffffff", stars: "#e5c98d", qrFrame: "#ffffff", shine: 70, matte: 15, radius: 18 }\nconst emptySigns: SignConfigs = { design: defaultDesign, google: { enabled: false }, pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
@@ -27,7 +27,7 @@ export default function AdminPage() {
       if (!response.ok) throw new Error(data.error || "Não foi possível carregar as empresas.")
       setCompanies(data)
       setEditUrls(Object.fromEntries(data.map((company: Company) => [company.id, company.review_url])))
-      setEditSigns(Object.fromEntries(data.map((company: Company) => [company.id, { ...emptySigns, ...(company.sign_configs || {}) }])))
+      setEditSigns(Object.fromEntries(data.map((company: Company) => [company.id, { ...emptySigns, ...(company.sign_configs || {}), design: { ...defaultDesign, ...((company.sign_configs as any)?.design || {}) } }])))
       setAuthenticated(true)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao carregar.")
@@ -146,7 +146,37 @@ export default function AdminPage() {
                   <div className="link-row"><input readOnly value={publicUrl(company.slug, defaultType(company))} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug, defaultType(company)))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={publicUrl(company.slug, defaultType(company))} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
                   
                   <div className="sign-config-editor">
-                    <h4>Configurar uma plaquinha por vez</h4>
+                    <h4>Configurar uma plaquinha por vez</h4>\n                    <div className="sign-design-editor">
+                      <h4>🎨 Personalizar aparência da plaquinha</h4>
+                      <p className="admin-muted">Veja o exemplo mudar na hora. Salve para aplicar na placa pública.</p>
+                      {(() => {
+                        const design = { ...defaultDesign, ...(editSigns[company.id]?.design || {}) }
+                        const updateDesign = (field: keyof SignDesign, value: string | number) => setEditSigns(old => {
+                          const current = old[company.id] || { ...emptySigns }
+                          return { ...old, [company.id]: { ...current, design: { ...defaultDesign, ...(current.design || {}), [field]: value } } }
+                        })
+                        const previewStyle = { backgroundColor: design.background, color: design.text, border: `3px solid ${design.border}`, borderRadius: design.radius, boxShadow: `inset 0 0 ${Math.round(design.shine / 4)}px rgba(255,255,255,${design.shine / 250}), inset 0 -12px ${Math.round(design.matte / 2 + 8)}px rgba(0,0,0,${design.matte / 100}), 0 8px 22px rgba(0,0,0,.3)`, backgroundImage: `linear-gradient(115deg, rgba(255,255,255,${design.shine / 350}) 0%, transparent 32%, rgba(255,255,255,${design.shine / 500}) 72%, transparent 100%)` }
+                        return <>
+                          <div className="sign-design-preview" style={previewStyle}>
+                            <div className="design-preview-icon" style={{ color: design.title }}>★</div>
+                            <div className="design-preview-stars" style={{ color: design.stars }}>★★★★★</div>
+                            <strong style={{ color: design.title }}>Avalie nossa empresa!</strong>
+                            <div className="design-preview-qr" style={{ borderColor: design.qrFrame }}><span /></div>
+                            <small style={{ color: design.text }}>QR CODE</small>
+                            <div className="design-preview-footer" style={{ borderColor: design.border }} />
+                          </div>
+                          <div className="sign-design-controls">
+                            {([{ key: "background", label: "Cor de fundo" }, { key: "border", label: "Cor da borda" }, { key: "text", label: "Textos e detalhes" }, { key: "title", label: "Título e ícone" }, { key: "stars", label: "Estrelas" }, { key: "qrFrame", label: "Moldura do QR Code" }] as const).map(item => <label className="design-color-field" key={item.key}>{item.label}<input type="color" value={design[item.key]} onChange={e => updateDesign(item.key, e.target.value)} /><code>{design[item.key]}</code></label>)}
+                            <label>Brilho metálico: {design.shine}%<input type="range" min="0" max="100" value={design.shine} onChange={e => updateDesign("shine", Number(e.target.value))} /></label>
+                            <label>Fosco: {design.matte}%<input type="range" min="0" max="100" value={design.matte} onChange={e => updateDesign("matte", Number(e.target.value))} /></label>
+                            <label>Arredondamento da borda: {design.radius}px<input type="range" min="0" max="36" value={design.radius} onChange={e => updateDesign("radius", Number(e.target.value))} /></label>
+                            <button className="admin-button secondary" type="button" onClick={() => updateDesign("background", defaultDesign.background)}>Voltar cor de fundo original</button>
+                            <button className="admin-button secondary" type="button" onClick={() => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), design: { ...defaultDesign } } }))}>Restaurar aparência original</button>
+                          </div>
+                        </>
+                      })()}
+                    </div>
+
                     <div className="sign-picker">{([{ id: "google", label: "Avaliação Google" }, { id: "whatsapp", label: "WhatsApp" }, { id: "pix", label: "Pix" }, { id: "wifi", label: "Wi-Fi" }, { id: "instagram", label: "Instagram" }] as const).map(option => <button type="button" key={option.id} className={"admin-button " + ((selectedSigns[company.id] || "whatsapp") === option.id ? "primary" : "secondary")} onClick={() => setSelectedSigns(old => ({ ...old, [company.id]: option.id }))}>{option.label}</button>)}</div>
                     {([selectedSigns[company.id] || "whatsapp"] as (keyof SignConfigs)[]).map(kind => {
                       const cfg = editSigns[company.id]?.[kind] || emptySigns[kind]
