@@ -432,8 +432,8 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
 
 /* Réplicas visuais das referências Pix e Instagram enviadas */
 .virtual-sign-page .sign-symbol {
-  width: 96px !important;
-  height: 96px !important;
+  width: 108px !important;
+  height: 108px !important;
   margin: 0 auto 24px !important;
   padding: 0 !important;
   border: 0 !important;
@@ -452,8 +452,8 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
 .virtual-sign-page .qr-shell { width: min(70vw, 285px); }
 @media (max-width: 520px) {
   .virtual-sign-page .sign-symbol {
-    width: 76px !important;
-    height: 76px !important;
+    width: 88px !important;
+    height: 88px !important;
     margin-bottom: 18px !important;
   }
   .virtual-sign-page .sign-symbol svg {
