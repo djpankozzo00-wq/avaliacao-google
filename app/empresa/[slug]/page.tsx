@@ -15,7 +15,7 @@ function GoogleMark() {
 export default function CompanyReviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const [company, setCompany] = useState<Company | null>(null)
   const [notFound, setNotFound] = useState(false)
-  const [activeKind, setActiveKind] = useState("google")
+  const [activeKind, setActiveKind] = useState("whatsapp")
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
   const [pixCopyPaste, setPixCopyPaste] = useState("")
   const [pixError, setPixError] = useState("")
@@ -78,8 +78,8 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   if (!company && !notFound) return <main className="review-page"><section className="review-card"><p className="subtitle">Carregando avaliação...</p></section></main>
   if (!company) return <main className="review-page"><section className="review-card"><h1>Link não encontrado</h1><p className="subtitle">Confira o endereço com a empresa.</p></section></main>
   const signs = company.sign_configs || {}
-  const availableKinds = ["google", "pix", "instagram", "wifi", "whatsapp"].filter(item => item === "google" || (signs[item]?.enabled && (item === "pix" ? signs.pix?.pix_key : item === "instagram" ? (signs.instagram?.url || signs.instagram?.username) : item === "wifi" ? signs.wifi?.network : signs.whatsapp?.phone)))
-  const kind = availableKinds.includes(activeKind) ? activeKind : "google"
+  const availableKinds = ["google", "pix", "instagram", "wifi", "whatsapp"].filter(item => item === "google" ? (signs.google?.enabled === true && Boolean(company.review_url)) : (signs[item]?.enabled && (item === "pix" ? signs.pix?.pix_key : item === "instagram" ? (signs.instagram?.url || signs.instagram?.username) : item === "wifi" ? signs.wifi?.network : signs.whatsapp?.phone)))
+  const kind = availableKinds.includes(activeKind) ? activeKind : (availableKinds[0] || "google")
   const changeSlide = (direction: number) => {
     const index = availableKinds.indexOf(kind)
     setActiveKind(availableKinds[(index + direction + availableKinds.length) % availableKinds.length])
