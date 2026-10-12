@@ -3,9 +3,11 @@
 import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
-type SignDesign = { background: string; border: string; text: string; title: string; stars: string; qrFrame: string; shine: number; matte: number; radius: number; }\ntype SignConfigs = { design?: SignDesign; google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
+type SignDesign = { background: string; border: string; text: string; title: string; stars: string; qrFrame: string; shine: number; matte: number; radius: number; titleFont: string; bodyFont: string; }
+type SignConfigs = { design?: SignDesign; google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
 type Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }
-const defaultDesign: SignDesign = { background: "#292a2c", border: "#d4b36a", text: "#f7f3e9", title: "#ffffff", stars: "#e5c98d", qrFrame: "#ffffff", shine: 70, matte: 15, radius: 18 }\nconst emptySigns: SignConfigs = { design: defaultDesign, google: { enabled: false }, pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
+const defaultDesign: SignDesign = { background: "#292a2c", border: "#d4b36a", text: "#f7f3e9", title: "#ffffff", stars: "#e5c98d", qrFrame: "#ffffff", shine: 70, matte: 15, radius: 18, titleFont: "Arial", bodyFont: "Arial" }
+const emptySigns: SignConfigs = { design: defaultDesign, google: { enabled: false }, pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
@@ -146,7 +148,8 @@ export default function AdminPage() {
                   <div className="link-row"><input readOnly value={publicUrl(company.slug, defaultType(company))} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug, defaultType(company)))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={publicUrl(company.slug, defaultType(company))} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
                   
                   <div className="sign-config-editor">
-                    <h4>Configurar uma plaquinha por vez</h4>\n                    <div className="sign-design-editor">
+                    <h4>Configurar uma plaquinha por vez</h4>
+                    <div className="sign-design-editor">
                       <h4>🎨 Personalizar aparência da plaquinha</h4>
                       <p className="admin-muted">Veja o exemplo mudar na hora. Salve para aplicar na placa pública.</p>
                       {(() => {
@@ -160,12 +163,14 @@ export default function AdminPage() {
                           <div className="sign-design-preview" style={previewStyle}>
                             <div className="design-preview-icon" style={{ color: design.title }}>★</div>
                             <div className="design-preview-stars" style={{ color: design.stars }}>★★★★★</div>
-                            <strong style={{ color: design.title }}>Avalie nossa empresa!</strong>
+                            <strong style={{ color: design.title, fontFamily: design.titleFont }}>Avalie nossa empresa!</strong>
                             <div className="design-preview-qr" style={{ borderColor: design.qrFrame }}><span /></div>
-                            <small style={{ color: design.text }}>QR CODE</small>
+                            <small style={{ color: design.text, fontFamily: design.bodyFont }}>QR CODE</small>
                             <div className="design-preview-footer" style={{ borderColor: design.border }} />
                           </div>
                           <div className="sign-design-controls">
+                            <label>Fonte do título<select value={design.titleFont} onChange={e => updateDesign("titleFont", e.target.value)}><option value="Arial">Arial — moderna</option><option value="Georgia">Georgia — elegante</option><option value="Times New Roman">Times New Roman — clássica</option><option value="Verdana">Verdana — legível</option><option value="Trebuchet MS">Trebuchet MS — arredondada</option><option value="Impact">Impact — forte</option><option value="Courier New">Courier New — máquina de escrever</option><option value="cursive">Cursiva — manuscrita</option></select></label>
+                            <label>Fonte dos textos<select value={design.bodyFont} onChange={e => updateDesign("bodyFont", e.target.value)}><option value="Arial">Arial — moderna</option><option value="Georgia">Georgia — elegante</option><option value="Times New Roman">Times New Roman — clássica</option><option value="Verdana">Verdana — legível</option><option value="Trebuchet MS">Trebuchet MS — arredondada</option><option value="Impact">Impact — forte</option><option value="Courier New">Courier New — máquina de escrever</option><option value="cursive">Cursiva — manuscrita</option></select></label>
                             {([{ key: "background", label: "Cor de fundo" }, { key: "border", label: "Cor da borda" }, { key: "text", label: "Textos e detalhes" }, { key: "title", label: "Título e ícone" }, { key: "stars", label: "Estrelas" }, { key: "qrFrame", label: "Moldura do QR Code" }] as const).map(item => <label className="design-color-field" key={item.key}>{item.label}<input type="color" value={design[item.key]} onChange={e => updateDesign(item.key, e.target.value)} /><code>{design[item.key]}</code></label>)}
                             <label>Brilho metálico: {design.shine}%<input type="range" min="0" max="100" value={design.shine} onChange={e => updateDesign("shine", Number(e.target.value))} /></label>
                             <label>Fosco: {design.matte}%<input type="range" min="0" max="100" value={design.matte} onChange={e => updateDesign("matte", Number(e.target.value))} /></label>
