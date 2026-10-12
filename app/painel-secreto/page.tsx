@@ -134,7 +134,7 @@ export default function AdminPage() {
                 {companies.map(company => <article className="company-item" key={company.id}>
                   <h3>{company.name}</h3>
                   <label>Link exclusivo desta empresa</label>
-                  <div className="link-row"><input readOnly value={publicUrl(company.slug)} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={`/empresa/${company.slug}`} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
+                  <div className="link-row"><input readOnly value={publicUrl(company.slug, company.review_url ? "google" : "whatsapp")} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug, company.review_url ? "google" : "whatsapp"))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={publicUrl(company.slug, company.review_url ? "google" : "whatsapp")} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
                   <label htmlFor={`review-${company.id}`}>Link de avaliação configurado</label>
                   <input id={`review-${company.id}`} type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} />
                   <div className="sign-config-editor">
