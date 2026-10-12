@@ -6,7 +6,7 @@ import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 
 type SignDesign = { background: string; border: string; text: string; title: string; stars: string; qrFrame: string; shine: number; matte: number; radius: number; titleFont: string; bodyFont: string; }
 type SignConfigs = { design?: SignDesign; google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
 type Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }
-const defaultDesign: SignDesign = { background: "#292a2c", border: "#d4b36a", text: "#f7f3e9", title: "#ffffff", stars: "#e5c98d", qrFrame: "#ffffff", shine: 70, matte: 15, radius: 18, titleFont: "Arial", bodyFont: "Arial" }
+const defaultDesign: SignDesign = { background: "#292925", border: "#7d6a46", text: "#e5c98d", title: "#e7c986", stars: "#e5c98d", qrFrame: "#f1d9a1", shine: 19, matte: 42, radius: 30, titleFont: "Arial", bodyFont: "Arial" }
 const emptySigns: SignConfigs = { design: defaultDesign, google: { enabled: false }, pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
