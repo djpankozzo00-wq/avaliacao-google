@@ -99,7 +99,7 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <div className={"google-mark sign-symbol sign-" + kind} aria-label={"Ícone " + kind} role="img"><img className="sign-icon-image" src={`/sign-icons/${kind}.png`} alt="" /></div>
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>{titles[kind] || titles.google}{kind === "google" ? <><br/>empresa!</> : null}</h1>
-      <p className="subtitle">{subtitles[kind] || company.name}</p>
+      <p className="subtitle" style={{ visibility: "hidden" }}>{subtitles[kind] || company.name}</p>
       <div className="qr-shell" style={kind === "wifi" && wifiFocus ? { transform: "scale(1.2)", margin: "28px auto", position: "relative", zIndex: 2, transition: "transform 180ms ease" } : { transition: "transform 180ms ease" }}><img src={qrCode} alt={kind === "wifi" ? "QR Code para conectar ao Wi-Fi" : `QR Code para avaliar ${company.name} no Google`} style={kind === "wifi" && wifiFocus ? { width: "min(78vw, 360px)", height: "auto" } : undefined} /></div>
       <p className="qr-label">{kind === "pix" ? (pixError ? "CONFIGURE O PIX NO PAINEL" : "PIX COPIA E COLA · TOQUE PARA COPIAR") : kind === "wifi" ? (wifiFocus ? "MODO DE CONEXÃO · TOQUE PARA VOLTAR" : "TOQUE NA PLACA PARA AMPLIAR O QR CODE") : "QR CODE"}</p>
       <div className="actions">
