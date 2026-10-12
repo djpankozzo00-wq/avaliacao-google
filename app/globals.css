@@ -449,10 +449,11 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
 }
 .virtual-sign-page .sign-pix svg { color: #8ed8f4; }
 .virtual-sign-page .sign-instagram svg { filter: drop-shadow(0 2px 1px rgba(0,0,0,.8)) drop-shadow(0 0 1px #e9d4a3); }
-.virtual-sign-page .qr-shell { width: min(70vw, 285px); }
-@media (max-width: 520px) {
+.virtual-sign-page .qr-shell { width: min(64vw, 250px); }
+  @media (max-width: 520px) {
+  .virtual-sign-page .qr-shell { width: 215px !important; }
   .virtual-sign-page .sign-symbol {
-    width: 88px !important;
+  width: 88px !important;
     height: 88px !important;
     margin-bottom: 18px !important;
   }
