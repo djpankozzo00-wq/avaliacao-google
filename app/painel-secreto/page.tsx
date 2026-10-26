@@ -23,7 +23,7 @@ export default function AdminPage() {
   const loadCompanies = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await fetch("/api/admin/companies", { cache: "no-store" })
+      const response = await fetch("/api/admin/companies", { cache: "no-store", credentials: "include" })
       if (response.status === 401) { setAuthenticated(false); return }
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível carregar as empresas.")
@@ -41,7 +41,7 @@ export default function AdminPage() {
   async function login(event: FormEvent) {
     event.preventDefault(); setError(""); setMessage(""); setLoading(true)
     try {
-      const response = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) })
+      const response = await fetch("/api/admin/login", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "include", body: JSON.stringify({ password }) })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível entrar.")
       setPassword(""); await loadCompanies()
@@ -91,7 +91,7 @@ export default function AdminPage() {
   }
 
   async function logout() {
-    await fetch("/api/admin/login", { method: "DELETE" })
+    await fetch("/api/admin/login", { method: "DELETE", credentials: "include" })
     setAuthenticated(false); setCompanies([]); setMessage("Sessão encerrada.")
   }
 
