@@ -3,9 +3,11 @@
 import { FormEvent, useCallback, useEffect, useState } from "react"
 import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
-type SignConfigs = { pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
+type SignDesign = { background: string; border: string; text: string; title: string; stars: string; qrFrame: string; shine: number; matte: number; radius: number; titleFont: string; bodyFont: string; }
+type SignConfigs = { design?: SignDesign; google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
 type Company = { id: string; name: string; slug: string; review_url: string; sign_configs?: SignConfigs; created_at?: string; updated_at?: string }
-const emptySigns: SignConfigs = { pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
+const defaultDesign: SignDesign = { background: "#292925", border: "#7d6a46", text: "#e5c98d", title: "#e7c986", stars: "#e5c98d", qrFrame: "#f1d9a1", shine: 19, matte: 42, radius: 30, titleFont: "Arial", bodyFont: "Arial" }
+const emptySigns: SignConfigs = { design: defaultDesign, google: { enabled: false }, pix: { enabled: false, pix_key: "", recipient: "", city: "" }, instagram: { enabled: false, username: "", url: "" }, wifi: { enabled: false, network: "", password: "", security: "WPA" }, whatsapp: { enabled: false, phone: "", message: "" } }
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false)
   const [password, setPassword] = useState("")
@@ -14,6 +16,7 @@ export default function AdminPage() {
   const [reviewUrl, setReviewUrl] = useState("")
   const [editUrls, setEditUrls] = useState<Record<string, string>>({})
   const [editSigns, setEditSigns] = useState<Record<string, SignConfigs>>({})
+  const [selectedSigns, setSelectedSigns] = useState<Record<string, keyof SignConfigs>>({})
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
@@ -26,7 +29,7 @@ export default function AdminPage() {
       if (!response.ok) throw new Error(data.error || "Não foi possível carregar as empresas.")
       setCompanies(data)
       setEditUrls(Object.fromEntries(data.map((company: Company) => [company.id, company.review_url])))
-      setEditSigns(Object.fromEntries(data.map((company: Company) => [company.id, { ...emptySigns, ...(company.sign_configs || {}) }])))
+      setEditSigns(Object.fromEntries(data.map((company: Company) => [company.id, { ...emptySigns, ...(company.sign_configs || {}), design: { ...defaultDesign, ...((company.sign_configs as any)?.design || {}) } }])))
       setAuthenticated(true)
     } catch (e) {
       setError(e instanceof Error ? e.message : "Erro ao carregar.")
@@ -64,7 +67,7 @@ export default function AdminPage() {
       const response = await fetch(`/api/admin/companies/${company.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ review_url: editUrls[company.id], sign_configs: editSigns[company.id] }) })
       const data = await response.json()
       if (!response.ok) throw new Error(data.error || "Não foi possível salvar.")
-      setMessage(`Link de avaliação de ${company.name} atualizado.`)
+      setMessage(`Configurações das plaquinhas de ${company.name} salvas.`)
       await loadCompanies()
     } catch (e) { setError(e instanceof Error ? e.message : "Erro ao salvar.") }
     finally { setLoading(false) }
@@ -98,6 +101,15 @@ export default function AdminPage() {
   }
 
   const publicUrl = (slug: string, type = "google") => typeof window === "undefined" ? `/empresa/${slug}?tipo=${type}` : `${window.location.origin}/empresa/${slug}?tipo=${type}`
+  const defaultType = (company: Company) => {
+    const signs = editSigns[company.id] || { ...emptySigns, ...(company.sign_configs || {}) }
+    if (signs.whatsapp?.enabled && signs.whatsapp.phone.trim()) return "whatsapp"
+    if (signs.pix?.enabled && signs.pix.pix_key.trim()) return "pix"
+    if (signs.wifi?.enabled && signs.wifi.network.trim()) return "wifi"
+    if (signs.instagram?.enabled && (signs.instagram.url.trim() || signs.instagram.username.trim())) return "instagram"
+    if (signs.google?.enabled && company.review_url) return "google"
+    return "whatsapp"
+  }
 
   return (
     <main className="admin-page">
@@ -119,12 +131,11 @@ export default function AdminPage() {
           <>
             <form className="admin-panel" onSubmit={create}>
               <h2><Plus size={20} /> Cadastrar empresa</h2>
-              <p>Informe o nome e o link oficial de avaliação do Google. Um endereço exclusivo será gerado para essa empresa.</p>
+              <p>Cadastre o cliente e configure somente a plaquinha que ele deseja usar. O link do Google é opcional.</p>
               <label htmlFor="company-name">Nome da empresa</label>
               <input id="company-name" value={name} onChange={e => setName(e.target.value)} placeholder="Digite o nome do estabelecimento" minLength={2} required />
-              <label htmlFor="review-url">Link de avaliação do Google</label>
-              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="https://g.page/r/.../review" required />
-              <p className="admin-muted">Use o buscador abaixo para encontrar o estabelecimento em Macaúbas e copiar o link do Google Maps.</p>
+              <label htmlFor="review-url">Link de avaliação do Google (opcional)</label>
+              <input id="review-url" type="url" value={reviewUrl} onChange={e => setReviewUrl(e.target.value)} placeholder="Preencha somente se quiser a plaquinha Google" />
               <button className="admin-button primary" disabled={loading}><Plus size={17} /> {loading ? "Salvando..." : "Cadastrar e gerar link exclusivo"}</button>
             </form>
 
@@ -134,17 +145,51 @@ export default function AdminPage() {
                 {companies.map(company => <article className="company-item" key={company.id}>
                   <h3>{company.name}</h3>
                   <label>Link exclusivo desta empresa</label>
-                  <div className="link-row"><input readOnly value={publicUrl(company.slug)} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={`/empresa/${company.slug}`} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
-                  <label htmlFor={`review-${company.id}`}>Link de avaliação configurado</label>
-                  <input id={`review-${company.id}`} type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} />
+                  <div className="link-row"><input readOnly value={publicUrl(company.slug, defaultType(company))} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug, defaultType(company)))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={publicUrl(company.slug, defaultType(company))} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
+                  
                   <div className="sign-config-editor">
-                    <h4>Configurar outras plaquinhas</h4>
-                    {(["pix", "instagram", "wifi", "whatsapp"] as const).map(kind => {
+                    <h4>Configurar uma plaquinha por vez</h4>
+                    <div className="sign-design-editor">
+                      <h4>🎨 Personalizar aparência da plaquinha</h4>
+                      <p className="admin-muted">Veja o exemplo mudar na hora. Salve para aplicar na placa pública.</p>
+                      {(() => {
+                        const design = { ...defaultDesign, ...(editSigns[company.id]?.design || {}) }
+                        const updateDesign = (field: keyof SignDesign, value: string | number) => setEditSigns(old => {
+                          const current = old[company.id] || { ...emptySigns }
+                          return { ...old, [company.id]: { ...current, design: { ...defaultDesign, ...(current.design || {}), [field]: value } } }
+                        })
+                        const previewStyle = { backgroundColor: design.background, color: design.text, border: `3px solid ${design.border}`, borderRadius: design.radius, boxShadow: `inset 0 0 ${Math.round(design.shine / 4)}px rgba(255,255,255,${design.shine / 250}), inset 0 -12px ${Math.round(design.matte / 2 + 8)}px rgba(0,0,0,${design.matte / 100}), 0 8px 22px rgba(0,0,0,.3)`, backgroundImage: `linear-gradient(115deg, rgba(255,255,255,${design.shine / 350}) 0%, transparent 32%, rgba(255,255,255,${design.shine / 500}) 72%, transparent 100%)` }
+                        return <>
+                          <div className="sign-design-preview" style={previewStyle}>
+                            <div className="design-preview-icon" style={{ color: design.title }}>★</div>
+                            <div className="design-preview-stars" style={{ color: design.stars }}>★★★★★</div>
+                            <strong style={{ color: design.title, fontFamily: design.titleFont }}>Avalie nossa empresa!</strong>
+                            <div className="design-preview-qr" style={{ borderColor: design.qrFrame }}><span /></div>
+                            <small style={{ color: design.text, fontFamily: design.bodyFont }}>QR CODE</small>
+                            <div className="design-preview-footer" style={{ borderColor: design.border }} />
+                          </div>
+                          <div className="sign-design-controls">
+                            <label>Fonte do título<select value={design.titleFont} onChange={e => updateDesign("titleFont", e.target.value)}><option value="Arial">Arial — moderna</option><option value="Georgia">Georgia — elegante</option><option value="Times New Roman">Times New Roman — clássica</option><option value="Verdana">Verdana — legível</option><option value="Trebuchet MS">Trebuchet MS — arredondada</option><option value="Impact">Impact — forte</option><option value="Courier New">Courier New — máquina de escrever</option><option value="cursive">Cursiva — manuscrita</option></select></label>
+                            <label>Fonte dos textos<select value={design.bodyFont} onChange={e => updateDesign("bodyFont", e.target.value)}><option value="Arial">Arial — moderna</option><option value="Georgia">Georgia — elegante</option><option value="Times New Roman">Times New Roman — clássica</option><option value="Verdana">Verdana — legível</option><option value="Trebuchet MS">Trebuchet MS — arredondada</option><option value="Impact">Impact — forte</option><option value="Courier New">Courier New — máquina de escrever</option><option value="cursive">Cursiva — manuscrita</option></select></label>
+                            {([{ key: "background", label: "Cor de fundo" }, { key: "border", label: "Cor da borda" }, { key: "text", label: "Textos e detalhes" }, { key: "title", label: "Título e ícone" }, { key: "stars", label: "Estrelas" }, { key: "qrFrame", label: "Moldura do QR Code" }] as const).map(item => <label className="design-color-field" key={item.key}>{item.label}<input type="color" value={design[item.key]} onChange={e => updateDesign(item.key, e.target.value)} /><code>{design[item.key]}</code></label>)}
+                            <label>Brilho metálico: {design.shine}%<input type="range" min="0" max="100" value={design.shine} onChange={e => updateDesign("shine", Number(e.target.value))} /></label>
+                            <label>Fosco: {design.matte}%<input type="range" min="0" max="100" value={design.matte} onChange={e => updateDesign("matte", Number(e.target.value))} /></label>
+                            <label>Arredondamento da borda: {design.radius}px<input type="range" min="0" max="36" value={design.radius} onChange={e => updateDesign("radius", Number(e.target.value))} /></label>
+                            <button className="admin-button secondary" type="button" onClick={() => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), design: { ...defaultDesign, ...(old[company.id]?.design || {}), background: defaultDesign.background, border: defaultDesign.border, text: defaultDesign.text, title: defaultDesign.title, stars: defaultDesign.stars, qrFrame: defaultDesign.qrFrame } } }))}>Restaurar todas as cores originais</button>
+                            <button className="admin-button secondary" type="button" onClick={() => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), design: { ...defaultDesign } } }))}>Restaurar aparência original</button>
+                          </div>
+                        </>
+                      })()}
+                    </div>
+
+                    <div className="sign-picker">{([{ id: "google", label: "Avaliação Google" }, { id: "whatsapp", label: "WhatsApp" }, { id: "pix", label: "Pix" }, { id: "wifi", label: "Wi-Fi" }, { id: "instagram", label: "Instagram" }] as const).map(option => <button type="button" key={option.id} className={"admin-button " + ((selectedSigns[company.id] || "whatsapp") === option.id ? "primary" : "secondary")} onClick={() => setSelectedSigns(old => ({ ...old, [company.id]: option.id }))}>{option.label}</button>)}</div>
+                    {([selectedSigns[company.id] || "whatsapp"] as (keyof SignConfigs)[]).map(kind => {
                       const cfg = editSigns[company.id]?.[kind] || emptySigns[kind]
                       const patch = (field: string, value: string | boolean) => setEditSigns(old => ({ ...old, [company.id]: { ...(old[company.id] || emptySigns), [kind]: { ...((old[company.id] || emptySigns)[kind]), [field]: value } } as SignConfigs }))
-                      const titles = { pix: "Pagamento Pix", instagram: "Instagram", wifi: "Wi-Fi", whatsapp: "WhatsApp" }
+                      const titles = { google: "Avaliação Google", pix: "Pagamento Pix", instagram: "Instagram", wifi: "Wi-Fi", whatsapp: "WhatsApp" }
                       return <div className="sign-config-item" key={kind}>
                         <label className="sign-enable"><input type="checkbox" checked={cfg.enabled} onChange={e => patch("enabled", e.target.checked)} /> Ativar placa de {titles[kind]}</label>
+                        {kind === "google" && <><label>Link de avaliação do Google</label><input type="url" value={editUrls[company.id] ?? company.review_url} onChange={e => setEditUrls(old => ({ ...old, [company.id]: e.target.value }))} placeholder="https://g.page/r/.../review" /></>}
                         {kind === "pix" && <><label>Chave Pix</label><input value={cfg.pix_key} onChange={e => patch("pix_key", e.target.value)} placeholder="Chave Pix" /><label>Nome do recebedor</label><input value={cfg.recipient} onChange={e => patch("recipient", e.target.value)} placeholder="Nome exibido na placa" /><label>Cidade do titular do Pix</label><input value={cfg.city || ""} onChange={e => patch("city", e.target.value.toUpperCase())} placeholder="Ex.: MACAÚBAS" maxLength={15} /></>}
                         {kind === "instagram" && <><label>Usuário do Instagram</label><input value={cfg.username} onChange={e => patch("username", e.target.value)} placeholder="@seuperfil" /><label>Link do perfil</label><input value={cfg.url} onChange={e => patch("url", e.target.value)} placeholder="https://instagram.com/seuperfil" /></>}
                         {kind === "wifi" && <><label>Nome da rede Wi-Fi</label><input value={cfg.network} onChange={e => patch("network", e.target.value)} placeholder="Nome da rede" /><label>Senha do Wi-Fi</label><input value={cfg.password} onChange={e => patch("password", e.target.value)} placeholder="Senha da rede" /><label>Tipo de segurança</label><select value={cfg.security || "WPA"} onChange={e => patch("security", e.target.value)}><option value="WPA">WPA/WPA2</option><option value="WEP">WEP</option><option value="nopass">Sem senha</option></select>{cfg.network.trim() && <div className="wifi-qr-preview"><p className="admin-muted">Prévia do QR Code Wi-Fi</p><img width="220" height="220" alt={"QR Code da rede Wi-Fi " + cfg.network} src={"https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=" + encodeURIComponent("WIFI:T:" + (cfg.security || "WPA") + ";S:" + cfg.network.replace(/([\\;,:"])/g, "\\$1") + ";" + ((cfg.security || "WPA") === "nopass" ? "" : "P:" + cfg.password.replace(/([\\;,:"])/g, "\\$1") + ";") + ";")} /></div>}</>}
@@ -153,7 +198,7 @@ export default function AdminPage() {
                       </div>
                     })}
                   </div>
-                  <button className="admin-button primary" type="button" onClick={() => void saveLink(company)} disabled={loading}><Save size={16} /> Salvar link de avaliação</button>
+                  <button className="admin-button primary" type="button" onClick={() => void saveLink(company)} disabled={loading}><Save size={16} /> Salvar configuração</button>
                   <button className="admin-button danger" type="button" onClick={() => void deleteCompany(company)} disabled={loading}><Trash2 size={16} /> Apagar empresa</button>
                 </article>)}
               </div>}

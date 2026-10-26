@@ -21,6 +21,7 @@ async function request(path: string, init: RequestInit = {}) {
 const columns = "id,name,slug,review_url,sign_configs,created_at,updated_at"
 function defaultSignConfigs() {
   return {
+    google: { enabled: false },
     pix: { enabled: false, pix_key: "", recipient: "", city: "" },
     instagram: { enabled: false, username: "", url: "" },
     wifi: { enabled: false, network: "", password: "", security: "WPA" },
@@ -39,7 +40,7 @@ export async function createCompany(input: CompanyInput) {
   const name = String(input.name ?? "").trim()
   const reviewUrl = String(input.review_url ?? "").trim()
   if (name.length < 2) throw new Error("Informe o nome da empresa.")
-  if (!isGoogleReviewUrl(reviewUrl)) throw new Error("Informe um link válido de avaliação do Google.")
+  if (reviewUrl && !isGoogleReviewUrl(reviewUrl)) throw new Error("Informe um link válido de avaliação do Google.")
   const slug = `${slugify(name)}-${cryptoRandom()}`
   const rows = await request(`companies?select=${columns}`, {
     method: "POST", headers: { Prefer: "return=representation" },
@@ -51,7 +52,7 @@ export async function updateCompany(id: string, input: CompanyInput) {
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() }
   if (input.review_url !== undefined) {
     const reviewUrl = String(input.review_url ?? "").trim()
-    if (!isGoogleReviewUrl(reviewUrl)) throw new Error("Informe um link válido de avaliação do Google.")
+    if (reviewUrl && !isGoogleReviewUrl(reviewUrl)) throw new Error("Informe um link válido de avaliação do Google.")
     patch.review_url = reviewUrl
   }
   if (input.sign_configs !== undefined) patch.sign_configs = input.sign_configs
