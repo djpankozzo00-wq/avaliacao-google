@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 
 type Company = { name: string; slug: string; review_url: string; sign_configs?: any }
@@ -15,8 +15,9 @@ function GoogleMark() {
 export default function CompanyReviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const [company, setCompany] = useState<Company | null>(null)
   const [notFound, setNotFound] = useState(false)
-  const [activeKind, setActiveKind] = useState("whatsapp")
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
+  const [activeKind, setActiveKind] = useState("google")
+  const touchStartX = useRef<number | null>(null)
+  const didSwipe = useRef(false)
   const [pixCopyPaste, setPixCopyPaste] = useState("")
   const [pixError, setPixError] = useState("")
   const [wifiFocus, setWifiFocus] = useState(false)
@@ -94,8 +95,8 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
   const subtitles: Record<string, string> = { google: company.name, pix: pixError || ("Titular: " + (signs.pix?.recipient || company.name)), instagram: "Nosso perfil é " + (signs.instagram?.username || ""), wifi: "Rede: " + (signs.wifi?.network || "") + " · Senha: " + (signs.wifi?.password || ""), whatsapp: "Nosso número: " + (signs.whatsapp?.phone || "") }
   const openReview = () => { if (kind === "wifi") { setWifiFocus(value => !value); return } if (kind === "google" || kind === "instagram" || kind === "whatsapp") window.open(kind === "google" ? company.review_url : payload, "_blank", "noopener,noreferrer"); if (kind === "pix" && payload) void navigator.clipboard?.writeText(payload) }
   if (availableKinds.length === 0 || !["google", "pix", "instagram", "wifi", "whatsapp"].includes(kind) || (kind !== "google" && (!cfg?.enabled || !payload))) return <main className="review-page"><section className="review-card"><h1>Placa indisponível</h1><p className="subtitle">Ative e configure a plaquinha desejada no painel administrativo.</p></section></main>
-  return <main className="review-page virtual-sign-page sign-carousel" onTouchStart={e => setTouchStartX(e.touches[0].clientX)} onTouchEnd={e => { if (touchStartX !== null) { const delta = e.changedTouches[0].clientX - touchStartX; if (Math.abs(delta) > 45) changeSlide(delta < 0 ? 1 : -1) } setTouchStartX(null) }}>
-    <section className={"review-card" + (kind === "wifi" && wifiFocus ? " wifi-focus" : "")} aria-label={"Placa " + kind + " de " + company.name} onClick={openReview} style={{ WebkitTextStroke: "0.25px #000", paintOrder: "stroke fill", "--sign-background": signs.design?.background || "#292a2c", "--sign-border": signs.design?.border || "#d4b36a", "--sign-text": signs.design?.text || "#f7f3e9", "--sign-title": signs.design?.title || "#ffffff", "--sign-stars": signs.design?.stars || "#e5c98d", "--sign-qr-frame": signs.design?.qrFrame || "#ffffff", "--sign-shine": String((signs.design?.shine ?? 70) / 100), "--sign-matte": String((signs.design?.matte ?? 15) / 100), "--sign-radius": (signs.design?.radius ?? 18) + "px", "--sign-title-font": signs.design?.titleFont || "Arial", "--sign-body-font": signs.design?.bodyFont || "Arial" } as React.CSSProperties}>
+  return <main className="review-page virtual-sign-page sign-carousel" onTouchStart={e => { touchStartX.current = e.touches[0].clientX; didSwipe.current = false }} onTouchEnd={e => { if (touchStartX.current !== null) { const delta = e.changedTouches[0].clientX - touchStartX.current; if (Math.abs(delta) > 45) { didSwipe.current = true; changeSlide(delta < 0 ? 1 : -1) } } touchStartX.current = null }}>
+    <section className={"review-card" + (kind === "wifi" && wifiFocus ? " wifi-focus" : "")} aria-label={"Placa " + kind + " de " + company.name} onClick={() => { if (didSwipe.current) { didSwipe.current = false; return } openReview() }} style={{ WebkitTextStroke: "0.25px #000", paintOrder: "stroke fill", "--sign-background": signs.design?.background || "#292a2c", "--sign-border": signs.design?.border || "#d4b36a", "--sign-text": signs.design?.text || "#f7f3e9", "--sign-title": signs.design?.title || "#ffffff", "--sign-stars": signs.design?.stars || "#e5c98d", "--sign-qr-frame": signs.design?.qrFrame || "#ffffff", "--sign-shine": String((signs.design?.shine ?? 70) / 100), "--sign-matte": String((signs.design?.matte ?? 15) / 100), "--sign-radius": (signs.design?.radius ?? 18) + "px", "--sign-title-font": signs.design?.titleFont || "Arial", "--sign-body-font": signs.design?.bodyFont || "Arial" } as React.CSSProperties}>
       <div className={"google-mark sign-symbol sign-" + kind} aria-label={"Ícone " + kind} role="img"><img className="sign-icon-image" src={`/sign-icons/${kind}.png`} alt="" /></div>
       <div className="stars" aria-label="Cinco estrelas"><span>★</span><span>★</span><span>★</span><span>★</span><span>★</span></div>
       <h1>{titles[kind] || titles.google}</h1>

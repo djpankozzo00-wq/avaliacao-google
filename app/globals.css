@@ -9,6 +9,9 @@
 html, body { min-height: 100%; }
 body { margin: 0; background: #070707; color: #fff; font-family: Arial, Helvetica, sans-serif; }
 
+.exact-plaque-page { min-height: 100dvh; width: 100%; display: flex; align-items: center; justify-content: center; background: #000; cursor: pointer; padding: 0; }
+.exact-plaque-image { display: block; width: min(100vw, 480px); height: auto; max-height: 100dvh; object-fit: contain; }
+
 .review-page {
   min-height: 100svh;
   display: flex;
@@ -502,6 +505,359 @@ body:has(.virtual-sign-page) { min-height: 100svh; }
 .sign-carousel-dots button.active { width: 18px; border-radius: 8px; background: #e5c98d; }
 
 
+/* Interação restaurada nas plaquinhas de imagem */
+.exact-plaque-image { transition: transform 180ms ease, filter 180ms ease; animation: exactPlaqueAppear .45s ease-out both; }
+.exact-plaque-page:active .exact-plaque-image { transform: scale(.985); filter: brightness(1.08); }
+@keyframes exactPlaqueAppear { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .exact-plaque-image { animation: none; transition: none; } }
+
+
+/* Mantém o tema original; melhora apenas o movimento e o encaixe no celular */
+html, body { min-height: 100%; }
+body { overflow-x: hidden; }
+.virtual-sign-page {
+  min-height: 100svh !important;
+  min-height: 100dvh !important;
+  width: 100%;
+  padding: max(0px, env(safe-area-inset-top)) max(0px, env(safe-area-inset-right)) max(0px, env(safe-area-inset-bottom)) max(0px, env(safe-area-inset-left)) !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow-x: hidden;
+}
+.virtual-sign-page .review-card {
+  width: 100% !important;
+  max-width: 560px !important;
+  min-height: 100svh !important;
+  min-height: 100dvh !important;
+  margin: auto;
+  transform-origin: center;
+  animation: plaqueEnter .55s cubic-bezier(.2,.8,.2,1) both;
+  transition: transform .2s ease, filter .2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.virtual-sign-page .review-card:active {
+  transform: scale(.994);
+  filter: brightness(1.035);
+}
+.virtual-sign-page .qr-shell {
+  transition: transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease;
+}
+.virtual-sign-page .review-card.wifi-focus .qr-shell {
+  transform: scale(1.12);
+}
+.virtual-sign-page .sign-carousel-controls { flex-shrink: 0; }
+@keyframes plaqueEnter {
+  from { opacity: 0; transform: translateY(10px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (max-width: 520px) {
+  .virtual-sign-page .review-card {
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .virtual-sign-page .review-card { animation: none !important; transition: none !important; }
+  .virtual-sign-page .qr-shell { transition: none !important; }
+}
+
+
+/* Tema cinza 3D da plaquinha: acabamento metálico, sem alterar a estrutura nem as interações */
+.virtual-sign-page { background: #101113 !important; }
+.virtual-sign-page .review-card {
+  border: 2px solid #aeb2b8 !important;
+  border-radius: 28px !important;
+  background-color: #686b70 !important;
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.34), transparent 42%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.045) 0 1px, transparent 1px 4px),
+    linear-gradient(145deg, #9a9da2 0%, #686b70 26%, #3e4146 62%, #777a7f 100%) !important;
+  box-shadow: inset 0 2px 3px rgba(255,255,255,.5), inset 0 0 0 3px rgba(20,22,25,.35), inset 0 -10px 22px rgba(0,0,0,.34), 0 3px 0 #222428, 0 18px 45px rgba(0,0,0,.68) !important;
+}
+.virtual-sign-page .review-card::before {
+  border-color: rgba(255,255,255,.24) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12);
+}
+.virtual-sign-page h1,
+.virtual-sign-page .subtitle,
+.virtual-sign-page .qr-label,
+.virtual-sign-page .action-item span,
+.virtual-sign-page .or,
+.virtual-sign-page .powered,
+.virtual-sign-page .powered strong {
+  color: #f2f3f5 !important;
+  text-shadow: 0 1px 0 rgba(0,0,0,.6), 0 2px 4px rgba(0,0,0,.42) !important;
+}
+.virtual-sign-page .qr-shell {
+  border: 1px solid #d5d7da !important;
+  background: linear-gradient(145deg, #f5f6f7, #c7cbd0) !important;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.9), 0 5px 12px rgba(0,0,0,.4) !important;
+}
+.virtual-sign-page .footer-line {
+  background: linear-gradient(90deg, transparent, #c7cbd0 8%, #e7e9eb 50%, #c7cbd0 92%, transparent) !important;
+}
+.virtual-sign-page .sign-carousel-controls > button {
+  border-color: rgba(238,240,242,.65) !important;
+  color: #f2f3f5 !important;
+  background: rgba(30,32,35,.4) !important;
+}
+.virtual-sign-page .sign-carousel-dots button { background: rgba(242,243,245,.4) !important; }
+.virtual-sign-page .sign-carousel-dots button.active { background: #f2f3f5 !important; }
+.virtual-sign-page .review-card:active { filter: brightness(1.08) !important; }
+@media (prefers-reduced-motion: reduce) {
+  .virtual-sign-page .review-card, .virtual-sign-page .qr-shell { animation: none !important; transition: none !important; }
+}
+
+
+/* Realismo 3D consistente em todas as plaquinhas (Google, Pix, Instagram, Wi-Fi e WhatsApp) */
+.virtual-sign-page .review-card {
+  isolation: isolate;
+  transform-style: preserve-3d;
+  background-image:
+    linear-gradient(115deg, rgba(255,255,255,.24) 0%, transparent 19%, transparent 67%, rgba(0,0,0,.22) 100%),
+    radial-gradient(ellipse at 22% 8%, rgba(255,255,255,.22), transparent 38%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 5px),
+    linear-gradient(145deg, #9b9ea3 0%, #707379 22%, #4b4e53 58%, #777a80 83%, #55585d 100%) !important;
+  box-shadow:
+    inset 0 2px 2px rgba(255,255,255,.62),
+    inset 0 0 0 2px rgba(255,255,255,.13),
+    inset 0 -5px 12px rgba(0,0,0,.3),
+    0 2px 0 #292b2f,
+    0 5px 0 #1b1d20,
+    0 18px 42px rgba(0,0,0,.58) !important;
+}
+.virtual-sign-page .review-card::before {
+  inset: 6px !important;
+  border: 1px solid rgba(255,255,255,.25) !important;
+  border-radius: 21px !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 1px 0 rgba(0,0,0,.16) !important;
+}
+.virtual-sign-page h1 {
+  color: #f7f8fa !important;
+  -webkit-text-stroke: .25px rgba(255,255,255,.45);
+  text-shadow: 0 1px 0 #d7d9dc, 0 2px 0 #8d9095, 0 3px 0 #55585d, 0 5px 7px rgba(0,0,0,.6) !important;
+}
+.virtual-sign-page .sign-symbol {
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,.25)) drop-shadow(0 5px 5px rgba(0,0,0,.24));
+}
+.virtual-sign-page .sign-symbol svg {
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.35)) drop-shadow(0 3px 2px rgba(0,0,0,.42)) !important;
+}
+.virtual-sign-page .qr-shell {
+  position: relative;
+  border-radius: 18px !important;
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.92), inset 0 -2px 0 rgba(0,0,0,.1), 0 2px 0 rgba(0,0,0,.3), 0 7px 14px rgba(0,0,0,.36) !important;
+}
+.virtual-sign-page .qr-shell img {
+  border-radius: 5px;
+}
+.virtual-sign-page .subtitle,
+.virtual-sign-page .qr-label,
+.virtual-sign-page .action-item span,
+.virtual-sign-page .or,
+.virtual-sign-page .powered,
+.virtual-sign-page .powered strong {
+  text-shadow: 0 1px 0 rgba(255,255,255,.12), 0 2px 3px rgba(0,0,0,.55) !important;
+}
+.virtual-sign-page .footer-line {
+  height: 2px !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.2), 0 3px 4px rgba(0,0,0,.3) !important;
+}
+@media (hover: hover) {
+  .virtual-sign-page .review-card:hover {
+    transform: translateY(-2px);
+    box-shadow: inset 0 2px 2px rgba(255,255,255,.62), inset 0 0 0 2px rgba(255,255,255,.13), inset 0 -5px 12px rgba(0,0,0,.3), 0 2px 0 #292b2f, 0 5px 0 #1b1d20, 0 23px 48px rgba(0,0,0,.62) !important;
+  }
+}
+
+
+/* REDESIGN FINAL — placa física em aço escovado 3D */
+.virtual-sign-page {
+  background:
+    radial-gradient(ellipse at 50% 10%, #34383d 0%, #17191c 48%, #090a0b 100%) !important;
+  padding: 18px 12px !important;
+}
+.virtual-sign-page > .review-card {
+  position: relative !important;
+  overflow: hidden !important;
+  isolation: isolate;
+  width: min(100%, 470px) !important;
+  min-height: min(860px, calc(100dvh - 36px)) !important;
+  padding: clamp(24px, 5vh, 46px) 22px 26px !important;
+  border: 1px solid #d9dde1 !important;
+  border-radius: 26px !important;
+  background:
+    linear-gradient(118deg, rgba(255,255,255,.35) 0%, transparent 16%, transparent 72%, rgba(0,0,0,.3) 100%),
+    repeating-linear-gradient(95deg, rgba(255,255,255,.035) 0 1px, rgba(0,0,0,.025) 1px 2px, transparent 2px 5px),
+    linear-gradient(145deg, #aeb3b9 0%, #777d84 18%, #555b62 42%, #3b4046 68%, #858b92 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 1px 0 0 rgba(255,255,255,.32),
+    inset 0 0 0 3px rgba(20,23,27,.28),
+    inset 0 -12px 24px rgba(0,0,0,.38),
+    0 2px 0 #555a60,
+    0 5px 0 #25292e,
+    0 9px 0 #121417,
+    0 24px 48px rgba(0,0,0,.7) !important;
+  animation: plaqueEnter .55s cubic-bezier(.2,.8,.2,1) both;
+}
+.virtual-sign-page > .review-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 7px !important;
+  z-index: -1;
+  border: 1px solid rgba(255,255,255,.38) !important;
+  border-radius: 19px !important;
+  box-shadow: inset 0 1px 2px rgba(255,255,255,.18), 0 1px 1px rgba(0,0,0,.22) !important;
+  pointer-events: none;
+}
+.virtual-sign-page > .review-card::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -2;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,.2), transparent 44%);
+  pointer-events: none;
+}
+.virtual-sign-page h1 {
+  color: #fff !important;
+  -webkit-text-stroke: .35px rgba(255,255,255,.35);
+  text-shadow: 0 1px 0 #d6d9dc, 0 2px 0 #777d84, 0 3px 0 #42474d, 0 5px 8px rgba(0,0,0,.62) !important;
+}
+.virtual-sign-page .subtitle,
+.virtual-sign-page .qr-label,
+.virtual-sign-page .action-item span,
+.virtual-sign-page .or,
+.virtual-sign-page .powered,
+.virtual-sign-page .powered strong {
+  color: #f7f8fa !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,.55), 0 3px 5px rgba(0,0,0,.35) !important;
+}
+.virtual-sign-page .sign-symbol {
+  filter: drop-shadow(0 2px 0 rgba(0,0,0,.3)) drop-shadow(0 7px 7px rgba(0,0,0,.32)) !important;
+}
+.virtual-sign-page .sign-symbol svg {
+  filter: drop-shadow(0 1px 0 rgba(255,255,255,.38)) drop-shadow(0 3px 2px rgba(0,0,0,.5)) !important;
+}
+/* Mantém o QR nítido e escaneável dentro de uma moldura metálica elevada */
+.virtual-sign-page .qr-shell {
+  border: 3px solid #dfe3e7 !important;
+  border-radius: 17px !important;
+  background: linear-gradient(145deg, #fff, #e5e8eb) !important;
+  box-shadow: inset 0 2px 2px rgba(255,255,255,.98), inset 0 -2px 3px rgba(0,0,0,.12), 0 2px 0 #70767d, 0 5px 0 #34393f, 0 10px 18px rgba(0,0,0,.38) !important;
+}
+.virtual-sign-page .qr-shell img {
+  display: block;
+  mix-blend-mode: normal !important;
+  image-rendering: pixelated;
+}
+.virtual-sign-page .footer-line {
+  background: linear-gradient(90deg, transparent, #e4e7ea 12%, #fff 50%, #b9bec4 88%, transparent) !important;
+  box-shadow: 0 1px 0 rgba(255,255,255,.28), 0 3px 5px rgba(0,0,0,.32) !important;
+}
+.virtual-sign-page .sign-carousel-controls > button {
+  border: 1px solid #e1e5e9 !important;
+  color: #fff !important;
+  background: linear-gradient(145deg, #777e85, #30353a) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.4), 0 3px 0 #171a1d, 0 5px 9px rgba(0,0,0,.35) !important;
+}
+.virtual-sign-page .sign-carousel-dots button { background: #aeb4bb !important; }
+.virtual-sign-page .sign-carousel-dots button.active { background: #fff !important; box-shadow: 0 0 7px rgba(255,255,255,.55); }
+@media (hover: hover) {
+  .virtual-sign-page > .review-card:hover {
+    transform: translateY(-2px) !important;
+    filter: brightness(1.04);
+  }
+}
+@media (max-width: 520px) {
+  .virtual-sign-page { padding: 8px !important; }
+  .virtual-sign-page > .review-card {
+    width: 100% !important;
+    min-height: calc(100dvh - 16px) !important;
+    padding: 22px 15px 18px !important;
+    border-radius: 23px !important;
+  }
+  .virtual-sign-page .qr-shell { width: min(64vw, 245px) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .virtual-sign-page > .review-card { animation: none !important; }
+}
+
+
+/* Restaurar o tema anterior: grafite metálico com detalhes dourados */
+.virtual-sign-page {
+  background: radial-gradient(ellipse at 50% 12%, #252525 0%, #0b0b0b 70%) !important;
+}
+.virtual-sign-page > .review-card {
+  border: 2px solid #d4b36a !important;
+  background-color: #292a2c !important;
+  background-image:
+    linear-gradient(112deg, rgba(255,255,255,.28) 0%, rgba(255,255,255,.10) 7%, transparent 20%, transparent 45%, rgba(255,255,255,.07) 53%, transparent 64%, rgba(255,255,255,.16) 78%, transparent 100%),
+    radial-gradient(ellipse at 28% 0%, rgba(255,255,255,.18), transparent 38%),
+    linear-gradient(180deg, rgba(255,255,255,.08) 0%, transparent 16%, transparent 78%, rgba(0,0,0,.24) 100%),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 4px),
+    linear-gradient(135deg, #515256 0%, #343539 22%, #222326 48%, #3b3c40 73%, #28292c 100%) !important;
+  box-shadow:
+    inset 0 2px 4px rgba(255,255,255,.4),
+    inset 0 0 0 1px rgba(255,255,255,.12),
+    inset 0 -14px 24px rgba(0,0,0,.42),
+    0 2px 0 #090909,
+    0 5px 0 #151515,
+    0 18px 45px rgba(0,0,0,.72) !important;
+}
+.virtual-sign-page > .review-card::before {
+  border-color: rgba(212,179,106,.62) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.1) !important;
+}
+.virtual-sign-page h1 {
+  color: #e7c986 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: 0 1px 0 #fff0c2, 0 2px 0 #9b7a42, 0 4px 5px rgba(0,0,0,.65) !important;
+}
+.virtual-sign-page .subtitle,
+.virtual-sign-page .qr-label,
+.virtual-sign-page .action-item span,
+.virtual-sign-page .or,
+.virtual-sign-page .powered,
+.virtual-sign-page .powered strong {
+  color: #e5c98d !important;
+  text-shadow: 0 2px 3px rgba(0,0,0,.8) !important;
+}
+.virtual-sign-page .qr-shell {
+  border: 2px solid #d4b36a !important;
+  background: linear-gradient(145deg, #fffdf7, #e8dfc8) !important;
+  box-shadow: inset 0 2px 2px rgba(255,255,255,.9), 0 3px 0 #7d673e, 0 8px 16px rgba(0,0,0,.4) !important;
+}
+.virtual-sign-page .qr-shell img { mix-blend-mode: normal !important; }
+.virtual-sign-page .footer-line {
+  background: linear-gradient(90deg, transparent, #b99750 10%, #f0d99e 50%, #b99750 90%, transparent) !important;
+}
+.virtual-sign-page .sign-carousel-controls > button {
+  border-color: rgba(212,179,106,.7) !important;
+  color: #e5c98d !important;
+  background: linear-gradient(145deg, #454545, #171717) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.15), 0 3px 0 #090909 !important;
+}
+.virtual-sign-page .sign-carousel-dots button { background: rgba(229,201,141,.4) !important; }
+.virtual-sign-page .sign-carousel-dots button.active { background: #e5c98d !important; }
+@media (max-width: 520px) {
+  .virtual-sign-page > .review-card { min-height: calc(100dvh - 16px) !important; }
+}
+
+
+/* Fundo do QR harmonizado com o grafite metálico da placa */
+.virtual-sign-page .qr-shell {
+  background: linear-gradient(145deg, #515256 0%, #343539 35%, #222326 70%, #3b3c40 100%) !important;
+}
+
+
+
+/* Preservar o preto no fundo da área do QR Code */
+.virtual-sign-page .qr-shell {
+  background: #000000 !important;
+}
 /* Seletor de plaquinhas no painel */
 .sign-picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 16px; }
 .sign-picker .admin-button.primary { margin-top: 0; }
