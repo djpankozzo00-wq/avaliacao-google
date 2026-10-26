@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useCallback, useEffect, useState } from "react"
+import { FormEvent, useCallback, useState } from "react"
 import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
 type SignDesign = { background: string; border: string; text: string; title: string; stars: string; qrFrame: string; shine: number; matte: number; radius: number; titleFont: string; bodyFont: string; }
@@ -36,7 +36,6 @@ export default function AdminPage() {
     } finally { setLoading(false) }
   }, [])
 
-  useEffect(() => { void loadCompanies() }, [loadCompanies])
 
   async function login(event: FormEvent) {
     event.preventDefault(); setError(""); setMessage(""); setLoading(true)
