@@ -18,8 +18,8 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ ok: true })
   response.cookies.set(adminCookie, createAdminSession(), {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: true,
+    sameSite: "none",
     path: "/",
     maxAge: 60 * 60 * 12,
   })
@@ -28,6 +28,6 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   const response = NextResponse.json({ ok: true })
-  response.cookies.set(adminCookie, "", { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "strict", path: "/", maxAge: 0 })
+  response.cookies.set(adminCookie, "", { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 0 })
   return response
 }
