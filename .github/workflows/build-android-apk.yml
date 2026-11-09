@@ -46,7 +46,16 @@ jobs:
           NAME="${INPUT_NAME:-Avaliação Google}"
           SLUG="$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//' | cut -c1-40)"
           if [ -z "$SLUG" ]; then echo "Slug inválido"; exit 1; fi
+          # Keep the original hyphenated slug for URLs, release tags and APK names.
+          # Android applicationId segments may contain only letters and digits.
+          PACKAGE_SLUG="$(printf '%s' "$SLUG" | tr -cd 'a-z0-9' | cut -c1-50)"
+          if [ -z "$PACKAGE_SLUG" ]; then PACKAGE_SLUG="demo"; fi
+          case "$PACKAGE_SLUG" in
+            [a-z]*) ;;
+            *) PACKAGE_SLUG="c$PACKAGE_SLUG" ;;
+          esac
           echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "package_slug=$PACKAGE_SLUG" >> "$GITHUB_OUTPUT"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "apk_name=avaliacao-google-$SLUG.apk" >> "$GITHUB_OUTPUT"
 
@@ -65,6 +74,7 @@ jobs:
         run: |
           gradle -p android-app assembleDebug \
             -PcompanySlug="${{ steps.company.outputs.slug }}" \
+            -PcompanyPackageSlug="${{ steps.company.outputs.package_slug }}" \
             -PcompanyName="${{ steps.company.outputs.name }}" \
             --stacktrace
 
