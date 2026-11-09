@@ -843,7 +843,12 @@ body { overflow-x: hidden; }
 .virtual-sign-page .sign-carousel-dots button { background: rgba(229,201,141,.4) !important; }
 .virtual-sign-page .sign-carousel-dots button.active { background: #e5c98d !important; }
 @media (max-width: 520px) {
-  .virtual-sign-page > .review-card { min-height: calc(100dvh - 16px) !important; }
+  .virtual-sign-page > .review-card {
+    min-height: 0 !important;
+    height: calc(100dvh - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+    margin: 0 auto !important;
+  }
 }
 
 
