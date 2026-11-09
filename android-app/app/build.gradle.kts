@@ -9,6 +9,7 @@ val companySlug = (project.findProperty("companySlug") as String?)
     ?.trim('-')
     ?.take(40)
     ?.ifBlank { "demo" } ?: "demo"
+val packageSlug = companySlug.replace(Regex("[^a-z0-9]"), "").let { if (it.firstOrNull()?.isLetter() == true) it else "c$it" }.take(50).ifBlank { "demo" }
 val companyName = (project.findProperty("companyName") as String?)
     ?.trim()
     ?.take(60)
@@ -20,7 +21,7 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "br.com.avaliacaogoogle.empresa.$companySlug"
+        applicationId = "br.com.avaliacaogoogle.empresa.$packageSlug"
         minSdk = 23
         targetSdk = 35
         versionCode = 1
