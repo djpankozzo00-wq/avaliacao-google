@@ -6,6 +6,12 @@ export const metadata: Metadata = {
   title: 'Avalie nossa empresa | Google',
   description: 'Placa virtual para avaliações no Google.',
   generator: 'v0.app',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Avaliação Google',
+  },
   icons: {
     icon: [
       {
@@ -20,17 +26,22 @@ export const metadata: Metadata = {
         url: '/icon.svg',
         type: 'image/svg+xml',
       },
+      {
+        url: '/pwa-icon.svg',
+        type: 'image/svg+xml',
+        sizes: '192x192 512x512',
+      },
     ],
     apple: '/apple-icon.png',
   },
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
-  ],
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  colorScheme: 'dark',
+  themeColor: '#1a1a1a',
 }
 
 export default function RootLayout({
