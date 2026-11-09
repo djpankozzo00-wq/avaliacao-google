@@ -1,7 +1,7 @@
 "use client"
 
 import { FormEvent, useCallback, useState } from "react"
-import { Copy, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
+import { Copy, Download, ExternalLink, LogOut, Plus, RefreshCw, Save, ShieldCheck, Trash2 } from "lucide-react"
 
 type SignDesign = { background: string; border: string; text: string; title: string; stars: string; qrFrame: string; shine: number; matte: number; radius: number; titleFont: string; bodyFont: string; }
 type SignConfigs = { design?: SignDesign; google: { enabled: boolean }; pix: { enabled: boolean; pix_key: string; recipient: string; city: string }; instagram: { enabled: boolean; username: string; url: string }; wifi: { enabled: boolean; network: string; password: string; security: string }; whatsapp: { enabled: boolean; phone: string; message: string } }
@@ -20,6 +20,8 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
+  const [buildingApp, setBuildingApp] = useState<string | null>(null)
+  const [appDownloads, setAppDownloads] = useState<Record<string, string>>({})
   const loadCompanies = useCallback(async () => {
     setLoading(true)
     try {
@@ -99,6 +101,30 @@ export default function AdminPage() {
     catch { setMessage("Não foi possível copiar automaticamente. Selecione e copie o link.") }
   }
 
+  async function generateCompanyApp(company: Company) {
+    setError(""); setMessage(""); setBuildingApp(company.slug)
+    try {
+      const start = await fetch(`/api/admin/company-app/${encodeURIComponent(company.slug)}`, { method: "POST", credentials: "include" })
+      const started = await start.json()
+      if (!start.ok) throw new Error(started.error || "Não foi possível iniciar a geração.")
+      setMessage(`Gerando o aplicativo de ${company.name}. Isso pode levar alguns minutos.`)
+      for (let attempt = 0; attempt < 36; attempt++) {
+        await new Promise(resolve => window.setTimeout(resolve, 5000))
+        const status = await fetch(`/api/admin/company-app/${encodeURIComponent(company.slug)}`, { cache: "no-store", credentials: "include" })
+        const result = await status.json()
+        if (!status.ok) throw new Error(result.error || "Falha ao consultar o APK.")
+        if (result.ready && result.download_url) {
+          setAppDownloads(old => ({ ...old, [company.slug]: result.download_url }))
+          setMessage(`APK exclusivo de ${company.name} pronto para baixar.`)
+          return
+        }
+      }
+      throw new Error("A compilação ainda está em andamento. Aguarde um pouco e tente atualizar o status.")
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Erro ao gerar o aplicativo.")
+    } finally { setBuildingApp(null) }
+  }
+
   const publicUrl = (slug: string, type = "google") => typeof window === "undefined" ? `/empresa/${slug}?tipo=${type}` : `${window.location.origin}/empresa/${slug}?tipo=${type}`
   const defaultType = (company: Company) => {
     const signs = editSigns[company.id] || { ...emptySigns, ...(company.sign_configs || {}) }
@@ -145,6 +171,12 @@ export default function AdminPage() {
                   <h3>{company.name}</h3>
                   <label>Link exclusivo desta empresa</label>
                   <div className="link-row"><input readOnly value={publicUrl(company.slug, defaultType(company))} /><button className="admin-button secondary icon-button" type="button" title="Copiar link exclusivo" onClick={() => void copy(publicUrl(company.slug, defaultType(company)))}><Copy size={16} /></button><a className="admin-button secondary icon-button" href={publicUrl(company.slug, defaultType(company))} target="_blank" rel="noreferrer" title="Abrir página"><ExternalLink size={16} /></a></div>
+                  <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:10}}>
+                    <button className="admin-button primary" type="button" disabled={loading || buildingApp !== null} onClick={() => void generateCompanyApp(company)}>
+                      <Download size={16} /> {buildingApp === company.slug ? "Gerando APK exclusivo..." : "Gerar aplicativo Android desta empresa"}
+                    </button>
+                    {appDownloads[company.slug] ? <a className="admin-button secondary" href={appDownloads[company.slug]}><Download size={16} /> Baixar APK exclusivo</a> : null}
+                  </div>
                   
                   <div className="sign-config-editor">
                     <h4>Configurar uma plaquinha por vez</h4>
