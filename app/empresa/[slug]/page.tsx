@@ -35,7 +35,7 @@ function InstallAppPrompt() {
   const buttonStyle = { display:"flex", alignItems:"center", gap:12, width:"100%", padding:"10px 14px", border:"1px solid #b99a53", borderRadius:16, color:"#fff", background:"linear-gradient(135deg,#292929,#090909)", boxShadow:"0 8px 28px #0008", textAlign:"left" as const, cursor:"pointer" }
   return <aside style={{position:"fixed",zIndex:50,left:12,right:12,bottom:"max(14px, env(safe-area-inset-bottom))",display:"flex",justifyContent:"center"}}>
     <div style={{position:"relative",width:"min(100%,390px)"}}>
-      {platform === "android" ? <a href="/app-android.apk" download="Avaliacao-Google.apk" onClick={markDownloaded} style={{...buttonStyle,textDecoration:"none"}}>
+      {platform === "android" ? <a href="https://github.com/djpankozzo00-wq/avaliacao-google/releases/latest/download/app-debug.apk" onClick={markDownloaded} style={{...buttonStyle,textDecoration:"none"}}>
         <img src="/app-icon.png" alt="Ícone do aplicativo" width="52" height="52" style={{borderRadius:12,objectFit:"cover"}}/>
         <span style={{flex:1}}><strong style={{display:"block"}}>Instalar aplicativo</strong><small style={{color:"#e6d4a7"}}>Android · baixar APK</small></span><b style={{fontSize:22,color:"#e6d4a7"}}>↓</b>
       </a> : <button type="button" onClick={() => setHelp(true)} style={buttonStyle}>
