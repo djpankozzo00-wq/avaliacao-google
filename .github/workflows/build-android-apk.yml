@@ -10,7 +10,7 @@ on:
       - ".github/workflows/build-android-apk.yml"
   push:
     branches:
-      - feat/android-immersive-navigation
+      - main
     paths:
       - "android-app/**"
       - ".github/workflows/build-android-apk.yml"
@@ -48,7 +48,7 @@ jobs:
           retention-days: 14
 
       - name: Publish APK download
-        if: github.event_name == 'workflow_dispatch'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: android-apk-${{ github.run_number }}
