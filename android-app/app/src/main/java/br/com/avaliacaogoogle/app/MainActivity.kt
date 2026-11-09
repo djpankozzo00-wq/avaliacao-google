@@ -30,6 +30,7 @@ class MainActivity : Activity() {
 
         webView = WebView(this).apply {
             setBackgroundColor(android.graphics.Color.rgb(26, 26, 26))
+            settings.userAgentString = settings.userAgentString + " AvaliacaoGoogleApp"
             settings.javaScriptEnabled = true
             settings.domStorageEnabled = true
             settings.loadsImagesAutomatically = true
