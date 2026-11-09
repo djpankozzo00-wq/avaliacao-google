@@ -12,7 +12,7 @@ import android.net.Uri
 
 class MainActivity : Activity() {
     private lateinit var webView: WebView
-    private val appUrl = "https://avaliacao-taupe-eight.vercel.app/"
+    private val appUrl = BuildConfig.COMPANY_URL
 
     @Suppress("DEPRECATION")
     private fun hideNavigationBar() {
