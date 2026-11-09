@@ -9,7 +9,13 @@ val companySlug = (project.findProperty("companySlug") as String?)
     ?.trim('-')
     ?.take(40)
     ?.ifBlank { "demo" } ?: "demo"
-val packageSlug = companySlug.replace(Regex("[^a-z0-9]"), "").let { if (it.firstOrNull()?.isLetter() == true) it else "c$it" }.take(50).ifBlank { "demo" }
+val packageSlug = ((project.findProperty("companyPackageSlug") as String?)
+    ?.lowercase()
+    ?.replace(Regex("[^a-z0-9]"), "")
+    ?: companySlug.replace(Regex("[^a-z0-9]"), ""))
+    .let { if (it.firstOrNull()?.isLetter() == true) it else "c$it" }
+    .take(50)
+    .ifBlank { "demo" }
 val companyName = (project.findProperty("companyName") as String?)
     ?.trim()
     ?.take(60)
