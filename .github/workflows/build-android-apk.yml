@@ -2,6 +2,15 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
+    inputs:
+      company_slug:
+        description: "Slug da empresa (ex.: ar-clima-by79u)"
+        required: true
+        type: string
+      company_name:
+        description: "Nome exibido no aplicativo"
+        required: true
+        type: string
   pull_request:
     branches:
       - main
@@ -25,6 +34,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set company configuration
+        id: company
+        shell: bash
+        env:
+          INPUT_SLUG: ${{ inputs.company_slug }}
+          INPUT_NAME: ${{ inputs.company_name }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          SLUG="${INPUT_SLUG:-demo}"
+          NAME="${INPUT_NAME:-Avaliação Google}"
+          SLUG="$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/--*/-/g; s/^-//; s/-$//' | cut -c1-40)"
+          if [ -z "$SLUG" ]; then echo "Slug inválido"; exit 1; fi
+          echo "slug=$SLUG" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "apk_name=avaliacao-google-$SLUG.apk" >> "$GITHUB_OUTPUT"
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -36,22 +61,29 @@ jobs:
         with:
           gradle-version: "8.9"
 
-      - name: Build debug APK
-        run: gradle -p android-app assembleDebug --stacktrace
+      - name: Build company APK
+        run: |
+          gradle -p android-app assembleDebug \
+            -PcompanySlug="${{ steps.company.outputs.slug }}" \
+            -PcompanyName="${{ steps.company.outputs.name }}" \
+            --stacktrace
+
+      - name: Rename APK
+        run: cp android-app/app/build/outputs/apk/debug/app-debug.apk "${{ steps.company.outputs.apk_name }}"
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: avaliacao-google-android-debug
-          path: android-app/app/build/outputs/apk/debug/app-debug.apk
+          name: ${{ steps.company.outputs.apk_name }}
+          path: ${{ steps.company.outputs.apk_name }}
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 30
 
-      - name: Publish APK download
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      - name: Publish company APK
+        if: github.event_name == 'workflow_dispatch'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: android-apk-${{ github.run_number }}
-          name: Aplicativo Avaliação Google - Android
-          files: android-app/app/build/outputs/apk/debug/app-debug.apk
-          make_latest: true
+          tag_name: app-${{ steps.company.outputs.slug }}-${{ github.run_number }}
+          name: App - ${{ steps.company.outputs.name }}
+          files: ${{ steps.company.outputs.apk_name }}
+          make_latest: false
