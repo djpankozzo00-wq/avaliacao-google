@@ -12,47 +12,6 @@ function GoogleMark() {
 }
 
 
-function InstallAppPrompt() {
-  const [platform, setPlatform] = useState<"android" | "ios" | "other" | "installed">("other")
-  const [completed, setCompleted] = useState(false)
-  const [help, setHelp] = useState(false)
-
-  useEffect(() => {
-    const ua = navigator.userAgent || ""
-    const ios = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
-    const installed = window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true || /AvaliacaoGoogleApp/i.test(ua)
-    setPlatform(installed ? "installed" : ios ? "ios" : /Android/i.test(ua) ? "android" : "other")
-    try { setCompleted(localStorage.getItem("plaquinhas-app-install-completed") === "1") } catch {}
-  }, [])
-
-  const markDownloaded = () => {
-    try { localStorage.setItem("plaquinhas-app-install-completed", "1") } catch {}
-    setCompleted(true)
-  }
-
-  if (completed || platform === "installed" || platform === "other") return null
-
-  const buttonStyle = { display:"flex", alignItems:"center", gap:12, width:"100%", padding:"10px 14px", border:"1px solid #b99a53", borderRadius:16, color:"#fff", background:"linear-gradient(135deg,#292929,#090909)", boxShadow:"0 8px 28px #0008", textAlign:"left" as const, cursor:"pointer" }
-  return <aside style={{position:"fixed",zIndex:50,left:12,right:12,bottom:"max(14px, env(safe-area-inset-bottom))",display:"flex",justifyContent:"center"}}>
-    <div style={{position:"relative",width:"min(100%,390px)"}}>
-      {platform === "android" ? <a href="https://github.com/djpankozzo00-wq/avaliacao-google/releases/latest/download/app-debug.apk" onClick={markDownloaded} style={{...buttonStyle,textDecoration:"none"}}>
-        <img src="/app-icon.png" alt="Ícone do aplicativo" width="52" height="52" style={{borderRadius:12,objectFit:"cover"}}/>
-        <span style={{flex:1}}><strong style={{display:"block"}}>Instalar aplicativo</strong><small style={{color:"#e6d4a7"}}>Android · baixar APK</small></span><b style={{fontSize:22,color:"#e6d4a7"}}>↓</b>
-      </a> : <button type="button" onClick={() => setHelp(true)} style={buttonStyle}>
-        <img src="/app-icon.png" alt="" width="52" height="52" style={{borderRadius:12,objectFit:"cover"}}/>
-        <span style={{flex:1,textAlign:"left"}}><strong style={{display:"block"}}>Instalar aplicativo</strong><small style={{color:"#e6d4a7"}}>iPhone / iPad · adicionar à tela inicial</small></span><b style={{fontSize:22,color:"#e6d4a7"}}>＋</b>
-      </button>}
-      {help ? <div role="dialog" aria-modal="true" style={{position:"fixed",inset:0,zIndex:60,background:"#000c",display:"grid",placeItems:"center",padding:20}}>
-        <div style={{maxWidth:350,width:"100%",padding:22,borderRadius:18,border:"1px solid #b99a53",background:"#171717",color:"#fff"}}>
-          <h2>Instalar no iPhone</h2>
-          <p>Abra esta página no Safari. Toque em <strong>Compartilhar</strong>, escolha <strong>Adicionar à Tela de Início</strong> e confirme em <strong>Adicionar</strong>. Depois, abra o aplicativo pela tela inicial; o aviso desaparecerá automaticamente.</p>
-          <button type="button" onClick={() => setHelp(false)} style={{width:"100%",padding:12,border:0,borderRadius:10,background:"#d7b66e",color:"#111",fontWeight:700}}>Entendi</button>
-        </div>
-      </div> : null}
-    </div>
-  </aside>
-}
-
 
 export default function CompanyReviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const [company, setCompany] = useState<Company | null>(null)
@@ -159,6 +118,5 @@ export default function CompanyReviewPage({ params }: { params: Promise<{ slug: 
       <div className="footer-line"/><p className="powered"><a href="https://www.instagram.com/_xdhesy_?psln=YzdmNG9rYW9jdmg=" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{ textDecoration: "none" }}>Powered by <strong>XDhe$y</strong></a></p>
       {availableKinds.length > 1 ? <div className="sign-carousel-controls"><button type="button" aria-label="Plaquinha anterior" onClick={e => { e.stopPropagation(); changeSlide(-1) }}>‹</button><div className="sign-carousel-dots">{availableKinds.map(item => <button type="button" key={item} aria-label={"Ver placa " + item} className={item === kind ? "active" : ""} onClick={e => { e.stopPropagation(); setActiveKind(item) }} />)}</div><button type="button" aria-label="Próxima plaquinha" onClick={e => { e.stopPropagation(); changeSlide(1) }}>›</button></div> : null}
     </section>
-    <InstallAppPrompt />
   </main>
 }
