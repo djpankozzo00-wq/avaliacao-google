@@ -955,158 +955,61 @@ body { overflow-x: hidden; }
 .virtual-sign-page .review-card .subtitle, .virtual-sign-page .review-card .qr-label, .virtual-sign-page .review-card .actions, .virtual-sign-page .review-card .powered { font-family: var(--sign-body-font, Arial), sans-serif !important; }
 
 
-/* Ajuste final do enquadramento no APK: reservar espaço real ao redor da placa.
-   O WebView Android tem uma área útil diferente do Chrome; não ocupar 100% dela. */
+/* Chrome mobile: placa inteira, sem recortes, com controles afastados das bordas.
+   O cartão pode ultrapassar a altura da viewport; nesse caso a página rola naturalmente. */
 @media (max-width: 520px) {
   .virtual-sign-page.sign-carousel {
+    display: flex !important;
     box-sizing: border-box !important;
     width: 100% !important;
-    height: 100dvh !important;
-    min-height: 100svh !important;
-    padding: 8px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    overflow: auto !important;
-  }
-
-  .virtual-sign-page.sign-carousel > .review-card {
-    box-sizing: border-box !important;
-    width: 100% !important;
-    height: calc(100dvh - 32px) !important;
-    min-height: 0 !important;
-    max-height: calc(100dvh - 32px) !important;
-    margin: auto !important;
-    flex: 0 1 auto !important;
-  }
-}
-
-
-/* Espaçamento inferior da plaquinha no Chrome mobile */
-@media (max-width: 520px) {
-  .virtual-sign-page.sign-carousel {
-    min-height: 100dvh !important;
     height: auto !important;
-    box-sizing: border-box !important;
-    padding: 12px 10px 18px !important;
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    padding: 18px 14px 24px !important;
     align-items: center !important;
     justify-content: center !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
   }
 
   .virtual-sign-page.sign-carousel > .review-card {
+    display: flex !important;
     box-sizing: border-box !important;
+    position: relative !important;
+    width: min(100%, 430px) !important;
     height: auto !important;
     min-height: 0 !important;
     max-height: none !important;
-    padding: 20px 15px 34px !important;
+    margin: auto !important;
+    padding: 22px 18px 24px !important;
+    flex: 0 0 auto !important;
     overflow: visible !important;
   }
 
   .virtual-sign-page .sign-carousel-controls {
-    flex-shrink: 0 !important;
-    margin-top: 18px !important;
-    margin-bottom: 8px !important;
-  }
-
-  .virtual-sign-page .sign-carousel-controls > button {
-    flex-shrink: 0 !important;
-  }
-}
-
-
-/* Centralização vertical e horizontal da plaquinha no Chrome mobile */
-@media (max-width: 520px) {
-  .virtual-sign-page.sign-carousel {
     display: flex !important;
     box-sizing: border-box !important;
     width: 100% !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-    padding: 12px 10px !important;
+    max-width: 260px !important;
+    margin: 18px auto 4px !important;
+    padding: 0 12px !important;
+    gap: 14px !important;
     align-items: center !important;
-    justify-content: center !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-
-  .virtual-sign-page.sign-carousel > .review-card {
-    box-sizing: border-box !important;
-    width: min(100%, 430px) !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: calc(100dvh - 24px) !important;
-    margin: auto !important;
+    justify-content: space-between !important;
     flex: 0 0 auto !important;
-    overflow-y: auto !important;
-  }
-}
-
-
-/* Mesmo enquadramento do APK para a plaquinha no Chrome mobile */
-@media (max-width: 520px) {
-  .virtual-sign-page.sign-carousel {
-    display: flex !important;
-    box-sizing: border-box !important;
-    width: 100% !important;
-    height: 100dvh !important;
-    min-height: 100dvh !important;
-    padding: 8px !important;
-    align-items: center !important;
-    justify-content: center !important;
-    overflow: auto !important;
-  }
-
-  .virtual-sign-page.sign-carousel > .review-card {
-    box-sizing: border-box !important;
-    width: 100% !important;
-    height: calc(100dvh - 32px) !important;
-    min-height: 0 !important;
-    max-height: calc(100dvh - 32px) !important;
-    margin: auto !important;
-    flex: 0 1 auto !important;
-    overflow: hidden !important;
-  }
-}
-
-
-/* Correção de recorte superior e afastamento das setas no Chrome */
-@media (max-width: 520px) {
-  .virtual-sign-page.sign-carousel {
-    height: auto !important;
-    min-height: 100dvh !important;
-    padding: 24px 14px 24px !important;
-    box-sizing: border-box !important;
-    align-items: center !important;
-    justify-content: center !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-
-  .virtual-sign-page.sign-carousel > .review-card {
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0 !important;
-    max-height: calc(100dvh - 72px) !important;
-    margin: auto !important;
-    padding: 26px 18px 28px !important;
-    box-sizing: border-box !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-
-  .virtual-sign-page .sign-carousel-controls {
-    display: flex !important;
-    width: max-content !important;
-    max-width: 100% !important;
-    margin: 18px auto 10px !important;
-    padding: 0 8px !important;
-    box-sizing: border-box !important;
-    gap: 20px !important;
-    justify-content: center !important;
   }
 
   .virtual-sign-page .sign-carousel-controls > button {
-    width: 34px !important;
-    height: 34px !important;
-    flex: 0 0 34px !important;
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .virtual-sign-page .sign-carousel-dots {
+    display: flex !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    justify-content: center !important;
+    gap: 10px !important;
   }
 }
