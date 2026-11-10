@@ -953,3 +953,29 @@ body { overflow-x: hidden; }
 /* Custom fonts for public sign */
 .virtual-sign-page .review-card h1 { font-family: var(--sign-title-font, Arial), sans-serif !important; }
 .virtual-sign-page .review-card .subtitle, .virtual-sign-page .review-card .qr-label, .virtual-sign-page .review-card .actions, .virtual-sign-page .review-card .powered { font-family: var(--sign-body-font, Arial), sans-serif !important; }
+
+
+/* Ajuste final do enquadramento no APK: reservar espaço real ao redor da placa.
+   O WebView Android tem uma área útil diferente do Chrome; não ocupar 100% dela. */
+@media (max-width: 520px) {
+  .virtual-sign-page.sign-carousel {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100svh !important;
+    padding: 8px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: auto !important;
+  }
+
+  .virtual-sign-page.sign-carousel > .review-card {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: calc(100dvh - 32px) !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 32px) !important;
+    margin: auto !important;
+    flex: 0 1 auto !important;
+  }
+}
