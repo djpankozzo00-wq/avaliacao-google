@@ -1066,3 +1066,47 @@ body { overflow-x: hidden; }
     overflow: hidden !important;
   }
 }
+
+
+/* Correção de recorte superior e afastamento das setas no Chrome */
+@media (max-width: 520px) {
+  .virtual-sign-page.sign-carousel {
+    height: auto !important;
+    min-height: 100dvh !important;
+    padding: 24px 14px 24px !important;
+    box-sizing: border-box !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .virtual-sign-page.sign-carousel > .review-card {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 72px) !important;
+    margin: auto !important;
+    padding: 26px 18px 28px !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .virtual-sign-page .sign-carousel-controls {
+    display: flex !important;
+    width: max-content !important;
+    max-width: 100% !important;
+    margin: 18px auto 10px !important;
+    padding: 0 8px !important;
+    box-sizing: border-box !important;
+    gap: 20px !important;
+    justify-content: center !important;
+  }
+
+  .virtual-sign-page .sign-carousel-controls > button {
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px !important;
+  }
+}
