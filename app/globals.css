@@ -979,3 +979,35 @@ body { overflow-x: hidden; }
     flex: 0 1 auto !important;
   }
 }
+
+
+/* Espaçamento inferior da plaquinha no Chrome mobile */
+@media (max-width: 520px) {
+  .virtual-sign-page.sign-carousel {
+    min-height: 100dvh !important;
+    height: auto !important;
+    box-sizing: border-box !important;
+    padding: 12px 10px 18px !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .virtual-sign-page.sign-carousel > .review-card {
+    box-sizing: border-box !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 20px 15px 34px !important;
+    overflow: visible !important;
+  }
+
+  .virtual-sign-page .sign-carousel-controls {
+    flex-shrink: 0 !important;
+    margin-top: 18px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .virtual-sign-page .sign-carousel-controls > button {
+    flex-shrink: 0 !important;
+  }
+}
