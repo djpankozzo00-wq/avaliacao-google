@@ -1039,3 +1039,30 @@ body { overflow-x: hidden; }
     overflow-y: auto !important;
   }
 }
+
+
+/* Mesmo enquadramento do APK para a plaquinha no Chrome mobile */
+@media (max-width: 520px) {
+  .virtual-sign-page.sign-carousel {
+    display: flex !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    padding: 8px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: auto !important;
+  }
+
+  .virtual-sign-page.sign-carousel > .review-card {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    height: calc(100dvh - 32px) !important;
+    min-height: 0 !important;
+    max-height: calc(100dvh - 32px) !important;
+    margin: auto !important;
+    flex: 0 1 auto !important;
+    overflow: hidden !important;
+  }
+}
